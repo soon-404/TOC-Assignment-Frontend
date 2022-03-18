@@ -1,13 +1,11 @@
 import { css } from '@emotion/react'
-import { Box, Button, CircularProgress, Paper, styled, useMediaQuery, useTheme } from '@mui/material'
+import { Box, Button, CircularProgress, styled, useMediaQuery, useTheme } from '@mui/material'
 import React from 'react'
 import { useStore } from 'hooks/useStore'
 
-const StepCardContainer = styled(Paper)<{ isMobile: boolean }>`
-  width: ${(props) => (props.isMobile ? '100%' : '782px')};
-  border-radius: 20px;
+const StepCardContainer = styled(Box)`
+  width: 100%;
   background-color: rgba(13, 19, 27, 0.7);
-  box-shadow: 0 16px 32px 0 rgba(0, 0, 0, 0.05);
 `
 
 const LoadingProgress = styled(CircularProgress)`
@@ -18,7 +16,6 @@ const LoadingProgress = styled(CircularProgress)`
 `
 
 type Props = {
-  steps: string[]
   onStepChange?: (step: number) => void
   onFinish: () => void
   onNext?: (val: number) => void
@@ -32,7 +29,6 @@ type Props = {
 }
 
 export const StepCard = ({
-  steps,
   onStepChange,
   onFinish,
   stepContents,
@@ -49,8 +45,8 @@ export const StepCard = ({
   const { activeStep, setActiveStep } = useStore()
 
   return (
-    <StepCardContainer isMobile={downSm}>
-      <Box flex={1} padding={downSm ? 2 : 5} display="flex" flexDirection="column" justifyContent="space-between">
+    <StepCardContainer>
+      <Box flex={1} display="flex" flexDirection="column" justifyContent="space-between">
         <Box flex={1}>{stepContents[activeStep]}</Box>
         <Box display="flex" justifyContent="space-between" marginTop={downSm ? 4 : 0}>
           <Button
@@ -74,7 +70,7 @@ export const StepCard = ({
             Back
           </Button>
           <Box>
-            {activeStep === steps.length - 1 && showSecondary && (
+            {activeStep === stepContents.length - 1 && showSecondary && (
               <Button
                 variant="outlined"
                 css={css`
@@ -93,7 +89,7 @@ export const StepCard = ({
                 max-width: 140px;
               `}
               onClick={() => {
-                if (activeStep === steps.length - 1) {
+                if (activeStep === stepContents.length - 1) {
                   onFinish()
                 } else {
                   setActiveStep(activeStep + 1)
@@ -107,7 +103,7 @@ export const StepCard = ({
               }}
             >
               {isWaitingTransaction && <LoadingProgress />}
-              {activeStep === steps.length - 1 ? (finishText ? finishText : 'Confirm') : 'Next'}
+              {activeStep === stepContents.length - 1 ? (finishText ? finishText : 'Confirm') : 'Next'}
             </Button>
           </Box>
         </Box>

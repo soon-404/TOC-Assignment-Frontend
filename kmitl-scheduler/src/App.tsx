@@ -12,11 +12,7 @@ export const App = () => {
   return (
     <AppWrapper>
       <Header />
-      <StepCard
-        steps={['DropItem', 'a', 'b', 'c']}
-        stepContents={[<DropItem />, <Box>A</Box>, <Box>B</Box>, <Box>C</Box>]}
-        onFinish={() => {}}
-      />
+      <StepCard stepContents={[<DropItem />, <Box>pages 2</Box>, <Box>pages 3</Box>]} onFinish={() => {}} />
     </AppWrapper>
   )
 }
