@@ -1,22 +1,7 @@
 import { css } from '@emotion/react'
-
-import {
-  Box,
-  Button,
-  CircularProgress,
-  Divider,
-  Paper,
-  Step,
-  StepLabel,
-  Stepper,
-  Typography,
-  styled,
-  useMediaQuery,
-  useTheme,
-} from '@mui/material'
-
-import React, { useState } from 'react'
-import { useStore } from '../../hooks/useStore'
+import { Box, Button, CircularProgress, Paper, styled, useMediaQuery, useTheme } from '@mui/material'
+import React from 'react'
+import { useStore } from 'hooks/useStore'
 
 const StepCardContainer = styled(Paper)<{ isMobile: boolean }>`
   width: ${(props) => (props.isMobile ? '100%' : '782px')};
@@ -33,12 +18,11 @@ const LoadingProgress = styled(CircularProgress)`
 `
 
 type Props = {
-  label?: string
   steps: string[]
   onStepChange?: (step: number) => void
   onFinish: () => void
   onNext?: (val: number) => void
-  stepContents: React.ReactNodeArray
+  stepContents: React.ReactNode[]
   finishText?: string
   onFirstStepBack?: () => void
   onSecondary?: () => void
@@ -48,7 +32,6 @@ type Props = {
 }
 
 export const StepCard = ({
-  label,
   steps,
   onStepChange,
   onFinish,
