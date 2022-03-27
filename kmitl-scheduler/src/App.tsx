@@ -1,18 +1,33 @@
-import { Box, Container, styled } from '@mui/material'
-import { DropItem } from 'components/DropItem'
-import { Header } from 'components/Header'
-import { StepCard } from 'components/StepperCard'
+import { Container, CssBaseline, styled } from '@mui/material'
+import { Routes, Route } from 'react-router-dom'
+import { ThemeProvider } from 'contexts/ThemeContext'
+import { StoreProvider } from 'contexts/StoreContext'
+import { Home } from 'pages/home'
+import { NotFound } from 'pages/404'
 
-const AppWrapper = styled(Container)(() => ({
-  minHeight: '100vh',
-  width: 'auto',
-}))
+const AppWrapper = styled(Container)`
+  min-height: 100vh;
+  width: 100vw;
+`
 
-export const App = () => {
+const Router: React.FC = () => {
   return (
-    <AppWrapper>
-      <Header />
-      <StepCard stepContents={[<DropItem />, <Box>pages 2</Box>, <Box>pages 3</Box>]} onFinish={() => {}} />
-    </AppWrapper>
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  )
+}
+
+export const App: React.FC = () => {
+  return (
+    <ThemeProvider>
+      <StoreProvider>
+        <CssBaseline />
+        <AppWrapper>
+          <Router />
+        </AppWrapper>
+      </StoreProvider>
+    </ThemeProvider>
   )
 }
