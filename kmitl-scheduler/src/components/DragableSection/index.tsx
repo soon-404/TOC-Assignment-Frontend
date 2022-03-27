@@ -1,20 +1,20 @@
 import { Box, Stack, styled, FormControl, InputLabel, Select, MenuItem } from '@mui/material'
-import React, { useState } from 'react'
+import React from 'react'
 import { Pee } from 'types/types'
 
-const Header = styled(Stack)(() => ({
-  width: '100%',
-  flexDirection: 'row',
-  justifyContent: 'center',
-  alignItems: 'center',
-}))
+const Header = styled(Stack)`
+  width: 100%;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+`
 
 interface Props {
   value: Pee
   setValue: (pee: Pee) => void
 }
 
-export const DragableSection = ({ setValue, value }: Props) => {
+export const DragableSection: React.FC<Props> = ({ setValue, value }) => {
   return (
     <Box>
       <Header>

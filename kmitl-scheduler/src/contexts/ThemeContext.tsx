@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { ReactNode, useMemo } from 'react'
 import { PaletteMode, createTheme, ThemeProvider as MuiThemeProvider } from '@mui/material'
 
 declare module '@mui/material/styles' {
@@ -13,7 +13,11 @@ declare module '@mui/material/styles' {
 }
 export const ThemeContext = React.createContext({ toggleColorMode: () => {} })
 
-export const ThemeProvider: React.FC = ({ children }: React.PropsWithChildren<React.ReactNode>) => {
+interface Props {
+  children: ReactNode
+}
+
+export const ThemeProvider: React.FC<Props> = ({ children }) => {
   const [mode, setMode] = React.useState<PaletteMode>('light')
 
   const colorMode = useMemo(

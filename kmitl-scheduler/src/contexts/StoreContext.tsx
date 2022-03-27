@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { ReactNode, useMemo, useState } from 'react'
 import { Pee } from 'types/types'
 
 interface IStoreContext {
@@ -10,7 +10,11 @@ interface IStoreContext {
 
 export const StoreContext = React.createContext<IStoreContext>({} as IStoreContext)
 
-export const StoreProvider: React.FC = ({ children }: React.PropsWithChildren<React.ReactNode>) => {
+interface Props {
+  children: ReactNode
+}
+
+export const StoreProvider: React.FC<Props> = ({ children }) => {
   const [activeStep, _setActiveStep] = useState<number>(0)
   const [pee, setPee] = useState<Pee>('')
 

@@ -4,7 +4,7 @@ import { useStore } from 'hooks/useStore'
 
 const steps = ['Select campaign settings', 'Create an ad group', 'Create an ad']
 
-export const SchedulerStepper = () => {
+export const SchedulerStepper: React.FC = () => {
   const { activeStep, setActiveStep } = useStore()
 
   return (

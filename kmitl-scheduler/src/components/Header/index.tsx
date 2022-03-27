@@ -1,14 +1,14 @@
 import React from 'react'
-import { Box, Typography, styled, Theme } from '@mui/material'
+import { Box, Typography, styled } from '@mui/material'
 import { SchedulerStepper } from 'components/Stepper'
 
-const StyledHeader = styled(Box)<{ theme?: Theme }>(({ theme }) => ({
-  backgroundColor: 'red',
-  padding: theme.spacing(4),
-  marginBottom: theme.spacing(8),
-}))
+const StyledHeader = styled(Box)`
+  background-color: red;
+  padding: 32px;
+  margin-bottom: 64px;
+`
 
-export const Header = () => {
+export const Header: React.FC = () => {
   return (
     <StyledHeader>
       <Typography variant="h4" align="center">

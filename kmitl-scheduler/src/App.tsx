@@ -1,5 +1,5 @@
 import { Container, CssBaseline, styled } from '@mui/material'
-import { Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { ThemeProvider } from 'contexts/ThemeContext'
 import { StoreProvider } from 'contexts/StoreContext'
 import { Home } from 'pages/home'
@@ -12,10 +12,12 @@ const AppWrapper = styled(Container)`
 
 const Router: React.FC = () => {
   return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </BrowserRouter>
   )
 }
 
