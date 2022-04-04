@@ -48,7 +48,6 @@ export const DropZone: React.FC<IDropZone> = ({ color, blocks, handleDropZonesDO
         sx={{
           width: '100%',
           height: 150,
-
           position: 'relative',
           overflow: 'auto',
         }}

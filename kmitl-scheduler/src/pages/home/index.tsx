@@ -10,6 +10,10 @@ import { IDomRect, IdragUpdate, isCoordsInDropBoundaries, SubjectBlock } from 'l
 import { useState } from 'react'
 import { useWindowSize } from 'usehooks-ts'
 
+import React from 'react'
+import '@mobiscroll/react/dist/css/mobiscroll.min.css'
+import { Eventcalendar as EventCalendar, getJson, toast, localeTh } from '@mobiscroll/react'
+
 const AppWrapper = styled(Container)(() => ({
   minHeight: '100vh',
   width: 'auto',
@@ -149,6 +153,25 @@ export const Home: React.FC = () => {
     setdropZonesDOMRects((prev: any) => ({ ...prev, ...zoneBoundingArea }))
   }
 
+  const [myEvents, setEvents] = React.useState([])
+
+  React.useEffect(() => {
+    getJson(
+      'https://trial.mobiscroll.com/events/?vers=5',
+      (events) => {
+        console.log(events)
+        setEvents(events)
+      },
+      'jsonp',
+    )
+  }, [])
+
+  const onEventClick = React.useCallback((event) => {
+    toast({
+      message: event.event.title,
+    })
+  }, [])
+
   return (
     <AnimateSharedLayout>
       <AppWrapper>
@@ -163,6 +186,22 @@ export const Home: React.FC = () => {
             handleDropZonesDOMRects={handleDropZonesDOMRects}
             blocks={selectedBlocks}
             onReorder={setSelectedBlocks}
+          />
+          <EventCalendar
+            theme="ios"
+            themeVariant="light"
+            clickToCreate={true}
+            dragToCreate={true}
+            dragToMove={true}
+            dragToResize={true}
+            locale={localeTh}
+            data={myEvents}
+            view={{
+              schedule: {
+                type: 'week',
+              },
+            }}
+            onEventClick={onEventClick}
           />
         </DragAndDropWrapper>
       </AppWrapper>

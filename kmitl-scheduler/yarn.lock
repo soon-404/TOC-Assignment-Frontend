@@ -393,6 +393,10 @@
     "@jridgewell/resolve-uri" "^3.0.3"
     "@jridgewell/sourcemap-codec" "^1.4.10"
 
+"@mobiscroll/react@https://npm.mobiscroll.com/@mobiscroll/react-trial/-/react-trial-5.15.2.tgz":
+  version "5.15.2"
+  resolved "https://npm.mobiscroll.com/@mobiscroll/react-trial/-/react-trial-5.15.2.tgz#42f3aac83adf0d427d4cc88fecc3ccf91ab1778b"
+
 "@mui/base@5.0.0-alpha.72":
   version "5.0.0-alpha.72"
   resolved "https://registry.npmjs.org/@mui/base/-/base-5.0.0-alpha.72.tgz"
