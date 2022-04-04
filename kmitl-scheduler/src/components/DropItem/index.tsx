@@ -2,16 +2,15 @@ import { Box, styled } from '@mui/material'
 import React, { useState, useCallback } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { useStore } from 'hooks/useStore'
-
 import { DragableSection } from 'components/DragableSection'
 
-const Root = styled(Box)(() => ({
-  height: '400px',
-  width: '100%',
-  backgroundColor: 'gray',
-  display: 'grid',
-  placeItems: 'center',
-}))
+const Root = styled(Box)`
+  height: 400px;
+  width: 100%;
+  background-color: gray;
+  display: grid;
+  place-items: center;
+`
 
 const DropzoneBox = styled(Box)`
   width: 100%;
