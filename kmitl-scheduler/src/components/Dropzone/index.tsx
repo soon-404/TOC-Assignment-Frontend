@@ -2,8 +2,9 @@ import { Box, List, Stack } from '@mui/material'
 import { Block } from 'components/Block'
 import { Reorder, useMotionValue } from 'framer-motion'
 import { useRaisedShadow } from 'hooks/useRaiseShadow'
-import { IDomRect, SubjectBlock } from 'lib/utils'
+import { IDomRect } from 'lib/utils'
 import { useEffect, useRef, useState } from 'react'
+import { SubjectBlock } from 'types'
 
 interface IDropZone {
   color: string
@@ -58,7 +59,7 @@ export const DropZone: React.FC<IDropZone> = ({ color, blocks, handleDropZonesDO
               blocks.map((block) => (
                 <Reorder.Item style={{ listStyle: 'none' }} key={block.id} value={block}>
                   <Block layoutId={`box-${block.id}`} initial={false} animate={{ backgroundColor: color }}>
-                    {block.name}
+                    {block.title}
                   </Block>
                 </Reorder.Item>
               ))}

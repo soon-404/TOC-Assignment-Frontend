@@ -1,5 +1,5 @@
 import React, { ReactNode, useMemo, useState } from 'react'
-import { Pee } from 'types/types'
+import { Pee } from 'types'
 
 interface IStoreContext {
   activeStep: number

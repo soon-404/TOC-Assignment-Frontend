@@ -3,7 +3,6 @@ import { Box, Typography, styled } from '@mui/material'
 import { SchedulerStepper } from 'components/Stepper'
 
 const StyledHeader = styled(Box)`
-  background-color: red;
   padding: 32px;
   margin-bottom: 64px;
 `

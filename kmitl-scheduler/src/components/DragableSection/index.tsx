@@ -1,6 +1,6 @@
 import { Box, Stack, styled, FormControl, InputLabel, Select, MenuItem } from '@mui/material'
 import React from 'react'
-import { Pee } from 'types/types'
+import { Pee } from 'types'
 
 const Header = styled(Stack)`
   width: 100%;

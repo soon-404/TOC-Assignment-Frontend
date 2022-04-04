@@ -1,3 +1,5 @@
+import { SubjectBlock } from 'types'
+
 export interface Icoords {
   x: number
   y: number
@@ -7,13 +9,6 @@ export interface IdragUpdate {
   action: 'onDrag' | 'onDragEnd'
   draggableCoords: Icoords
   inComingBlock: SubjectBlock
-}
-
-export interface SubjectBlock {
-  id: string
-  name: string
-  x: number
-  y: number
 }
 
 export interface IisHoverItsDropzone {

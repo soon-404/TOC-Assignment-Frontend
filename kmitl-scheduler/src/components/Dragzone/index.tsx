@@ -1,7 +1,8 @@
 import { Box, List, Stack } from '@mui/material'
 import { Block } from 'components/Block'
-import { IdragUpdate, SubjectBlock } from 'lib/utils'
+import { IdragUpdate } from 'lib/utils'
 import { useState } from 'react'
+import { SubjectBlock } from 'types'
 
 interface IDragZone {
   color: string
@@ -70,7 +71,7 @@ export const DragZone: React.FC<IDragZone> = ({ color, blocks, handleOnDrag }) =
                 }}
                 exit={{ opacity: 0, transition: { duration: 0.2 } }}
               >
-                {block.name}
+                {block.title}
               </Block>
             ))}
         </Stack>

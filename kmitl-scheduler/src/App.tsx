@@ -8,6 +8,7 @@ import { NotFound } from 'pages/404'
 const AppWrapper = styled(Container)`
   min-height: 100vh;
   width: 100vw;
+  background: 'linear-gradient(250deg, #7b2ff7, #f107a3)';
 `
 
 const Router: React.FC = () => {
