@@ -147,12 +147,12 @@ export const Home: React.FC = () => {
   const [dropZonesDOMRects, setdropZonesDOMRects] = useState<any | null>(null)
 
   const handleOnDrag = ({ action, draggableCoords, inComingBlock }: IdragUpdate) => {
-    console.log(dropZonesDOMRects)
+    // console.log(dropZonesDOMRects)
     const isInDropzoneBoundaries = isCoordsInDropBoundaries(draggableCoords, dropZonesDOMRects)
     switch (action) {
       case 'onDrag':
         if (isInDropzoneBoundaries) {
-          console.log('In dropzone')
+          // console.log('In dropzone')
           setIsHoverItsDropzone(true)
         } else {
           setIsHoverItsDropzone(false)
@@ -172,7 +172,7 @@ export const Home: React.FC = () => {
     setdropZonesDOMRects((prev: any) => ({ ...prev, ...zoneBoundingArea }))
   }
 
-  const [myEvents, setEvents] = React.useState([])
+  // const [myEvents, setEvents] = React.useState([])
 
   // React.useEffect(() => {
   //   getJson(
@@ -186,7 +186,7 @@ export const Home: React.FC = () => {
   // }, [])
 
   const onEventClick = React.useCallback((event) => {
-    console.log(event)
+    // console.log(event)
     toast({
       message: event.event.title,
     })
@@ -196,7 +196,7 @@ export const Home: React.FC = () => {
     <AnimateSharedLayout>
       <AppWrapper>
         <Header />
-        {/* <StepCard stepConte,nts={[<DropItem />, <Box>pages 2</Box>, <Box>pages 3</Box>]} onFinish={() => {}} /> */}
+        {/* <StepCard stepContents={[<DropItem />, <Box>pages 2</Box>, <Box>pages 3</Box>]} onFinish={() => {}} /> */}
         <MainWrapper>
           <DragZone color="#f107a3" blocks={blocks} handleOnDrag={handleOnDrag} />
           <DropZone

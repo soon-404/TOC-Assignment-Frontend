@@ -1,5 +1,7 @@
 import { Box, List, Stack } from '@mui/material'
 import { Block } from 'components/Block'
+import BlockDetailDialog from 'components/Dialog/BlockDetailDialog'
+import { PanInfo } from 'framer-motion'
 import { IdragUpdate } from 'lib/utils'
 import { useState } from 'react'
 import { SubjectBlock } from 'types'
@@ -10,7 +12,12 @@ interface IDragZone {
   handleOnDrag?: (dragUpdate: IdragUpdate) => void
 }
 export const DragZone: React.FC<IDragZone> = ({ color, blocks, handleOnDrag }) => {
+  const [open, setOpen] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
+
+  const handleOnClose = () => {
+    setOpen(false)
+  }
 
   return (
     <Box sx={{ position: 'relative' }}>
@@ -47,6 +54,10 @@ export const DragZone: React.FC<IDragZone> = ({ color, blocks, handleOnDrag }) =
                   bounceStiffness: 300,
                   bounceDamping: 25,
                 }}
+                onDoubleClick={(e) => {
+                  setOpen(true)
+                  // console.log('double click')
+                }}
                 onDrag={(_, info) => {
                   setIsDragging(true)
                   if (handleOnDrag) {
@@ -69,13 +80,13 @@ export const DragZone: React.FC<IDragZone> = ({ color, blocks, handleOnDrag }) =
                       inComingBlock: block,
                     })
                 }}
-                exit={{ opacity: 0, transition: { duration: 0.2 } }}
               >
                 {block.title}
               </Block>
             ))}
         </Stack>
       </List>
+      <BlockDetailDialog open={open} onClose={handleOnClose} />
     </Box>
   )
 }

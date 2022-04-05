@@ -9,5 +9,5 @@ export const Block = styled(motion.div)(() => ({
   height: '100px',
   borderRadius: '20px',
   color: 'white',
-  zIndex: '9999',
+  zIndex: '1',
 }))
