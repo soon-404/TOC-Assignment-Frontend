@@ -1,5 +1,5 @@
 import React from 'react'
-import { Box, Dialog, DialogTitle, Stack, Typography } from '@mui/material'
+import { Box, Dialog, DialogTitle, Paper, Stack, Typography } from '@mui/material'
 
 import mockData from './mock'
 
@@ -30,13 +30,13 @@ const TextBox: React.FC<TextBoxProps> = ({ keyof, values, icon }) => {
         my: 2,
       }}
     >
-      <Typography>{keyof} :</Typography>
-      <Stack>
-        {values.map((value, index) => (
-          <Typography key={`${value}-${index}`} sx={{ my: 1 }}>
-            {value}
-          </Typography>
-        ))}
+      <Stack direction="row">
+        <Typography>{keyof} : </Typography>
+        <Stack sx={{ ml: 1 }}>
+          {values.map((value, index) => (
+            <Box key={`${value}-${index}`}>{value}</Box>
+          ))}
+        </Stack>
       </Stack>
       {renderIcon(icon)}
     </Box>
@@ -46,7 +46,7 @@ const TextBox: React.FC<TextBoxProps> = ({ keyof, values, icon }) => {
 const BlockDetailDialog: React.FC<BlockDetailDialogProps> = ({ onClose, open }) => {
   return (
     <Dialog onClose={onClose} open={open}>
-      <DialogTitle>คณิตศาสตร์</DialogTitle>
+      <DialogTitle sx={{ mx: 'auto' }}>คณิตศาสตร์</DialogTitle>
       {mockData.map((block) => (
         <TextBox key={block.key} keyof={block.key} values={block.values} icon={block.icon ? block.icon : undefined} />
       ))}
