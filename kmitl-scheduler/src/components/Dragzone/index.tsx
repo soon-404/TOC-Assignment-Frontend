@@ -1,10 +1,9 @@
 import { Box, List, Stack } from '@mui/material'
 import { Block } from 'components/Block'
 import BlockDetailDialog from 'components/Dialog/BlockDetailDialog'
-import { PanInfo } from 'framer-motion'
-import { IdragUpdate } from 'lib/utils'
+
 import { useState } from 'react'
-import { SubjectBlock } from 'types'
+import { SubjectBlock, IdragUpdate } from 'types'
 
 interface IDragZone {
   color: string
@@ -45,9 +44,9 @@ export const DragZone: React.FC<IDragZone> = ({ color, blocks, handleOnDrag }) =
             blocks.map((block) => (
               <Block
                 key={block.id}
+                drag={true}
                 initial={false}
                 animate={{ backgroundColor: color }}
-                drag
                 dragConstraints={{ top: 0, left: 0, right: 0, bottom: 0 }}
                 dragElastic={1}
                 dragTransition={{

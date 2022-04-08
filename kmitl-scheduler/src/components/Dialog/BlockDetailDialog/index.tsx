@@ -1,7 +1,7 @@
 import React from 'react'
-import { Box, Dialog, DialogTitle, Paper, Stack, Typography } from '@mui/material'
+import { Box, Dialog, DialogTitle, Stack, Typography } from '@mui/material'
 
-import mockData from './mock'
+import { subjectData } from 'mock/subjectData'
 
 interface BlockDetailDialogProps {
   open: boolean
@@ -47,7 +47,7 @@ const BlockDetailDialog: React.FC<BlockDetailDialogProps> = ({ onClose, open }) 
   return (
     <Dialog onClose={onClose} open={open}>
       <DialogTitle sx={{ mx: 'auto' }}>คณิตศาสตร์</DialogTitle>
-      {mockData.map((block) => (
+      {subjectData.map((block) => (
         <TextBox key={block.key} keyof={block.key} values={block.values} icon={block.icon ? block.icon : undefined} />
       ))}
     </Dialog>

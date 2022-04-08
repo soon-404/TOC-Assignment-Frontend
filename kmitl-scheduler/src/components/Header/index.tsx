@@ -2,18 +2,30 @@ import React from 'react'
 import { Box, Typography, styled } from '@mui/material'
 import { SchedulerStepper } from 'components/Stepper'
 
-const StyledHeader = styled(Box)`
-  padding: 32px;
-  margin-bottom: 64px;
-`
+const StyledHeader = styled(Box)(() => ({
+  width: '100%',
+  paddingTop: 16,
+}))
+
+const TypographyWrapper = styled(Box)(() => ({
+  width: '100%',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  paddingBottom: 16,
+}))
 
 export const Header: React.FC = () => {
   return (
     <StyledHeader>
-      <Typography variant="h4" align="center">
-        จะจบเมื่อไหร่ซิ
-      </Typography>
-      <SchedulerStepper />
+      <TypographyWrapper>
+        <Typography variant="h4" color="#fff" align="center">
+          จะจบเมื่อไหร่ซิ
+        </Typography>
+      </TypographyWrapper>
+      <Box width="100%">
+        <SchedulerStepper />
+      </Box>
     </StyledHeader>
   )
 }

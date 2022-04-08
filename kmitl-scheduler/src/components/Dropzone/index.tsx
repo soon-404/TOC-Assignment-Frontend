@@ -1,10 +1,12 @@
-import { Box, List, Stack } from '@mui/material'
-import { Block } from 'components/Block'
-import { Reorder, useMotionValue } from 'framer-motion'
-import { useRaisedShadow } from 'hooks/useRaiseShadow'
-import { IDomRect, IdragUpdate } from 'lib/utils'
 import { useEffect, useRef, useState } from 'react'
-import { SubjectBlock } from 'types'
+import { Box, List, Stack } from '@mui/material'
+import { Reorder, useMotionValue } from 'framer-motion'
+
+import { useRaisedShadow } from 'hooks/useRaiseShadow'
+
+import { Block } from 'components/Block'
+
+import { SubjectBlock, IDomRect } from 'types'
 
 interface IDropZone {
   color: string
@@ -34,7 +36,7 @@ export const DropZone: React.FC<IDropZone> = ({ color, blocks, handleDropZonesDO
   }, [width, height, blocks])
 
   return (
-    <div ref={zoneRef} style={{ position: 'relative' }}>
+    <Box ref={zoneRef} position="relative">
       <Box
         sx={{
           background: 'black',
@@ -73,6 +75,6 @@ export const DropZone: React.FC<IDropZone> = ({ color, blocks, handleDropZonesDO
           </Stack>
         </Reorder.Group>
       </List>
-    </div>
+    </Box>
   )
 }

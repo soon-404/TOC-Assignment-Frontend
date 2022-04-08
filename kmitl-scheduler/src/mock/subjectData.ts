@@ -1,4 +1,4 @@
-export default [
+export const subjectData = [
   {
     key: 'รหัสวิชา',
     values: ['01076013'],
