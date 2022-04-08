@@ -1,9 +1,10 @@
-import { animate, MotionValue, useMotionValue } from 'framer-motion'
 import { useEffect } from 'react'
+import { animate, MotionValue, useMotionValue } from 'framer-motion'
 
 const inactiveShadow = '0px 0px 0px rgba(0,0,0,0.8)'
+const activeShadow = '5px 5px 10px rgba(0,0,0,0.3)'
 
-export function useRaisedShadow(value: MotionValue<number>) {
+export const useRaisedShadow = (value: MotionValue<number>) => {
   const boxShadow = useMotionValue(inactiveShadow)
 
   useEffect(() => {
@@ -12,12 +13,12 @@ export function useRaisedShadow(value: MotionValue<number>) {
       const wasActive = isActive
       if (latest !== 0) {
         isActive = true
-        if (isActive !== wasActive) {
-          animate(boxShadow, '5px 5px 10px rgba(0,0,0,0.3)')
+        if (!wasActive) {
+          animate(boxShadow, activeShadow)
         }
       } else {
         isActive = false
-        if (isActive !== wasActive) {
+        if (wasActive) {
           animate(boxShadow, inactiveShadow)
         }
       }

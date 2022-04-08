@@ -1,21 +1,38 @@
 import React from 'react'
-import { Step, StepButton, Stepper } from '@mui/material'
+import { Step, StepButton, Stepper, styled, Typography } from '@mui/material'
 import { useStore } from 'hooks/useStore'
 
-const steps = ['Select campaign settings', 'Create an ad group', 'Create an ad']
+const steps = ['step 1', 'something 2', 'lorem 3', 'alcohol 4']
+
+const StyledStepper = styled(Stepper)(() => ({
+  padding: '24px 0',
+}))
+
+const StyledStepButton = styled(StepButton)(() => ({
+  color: 'inherit',
+}))
+
+const ButtonTypography = styled(Typography)(() => ({
+  color: 'white',
+  fontWeight: 400,
+  '.Mui-active > &': {
+    fontWeight: 600,
+    color: 'yellow',
+  },
+}))
 
 export const SchedulerStepper: React.FC = () => {
   const { activeStep, setActiveStep } = useStore()
 
   return (
-    <Stepper nonLinear activeStep={activeStep}>
+    <StyledStepper nonLinear activeStep={activeStep}>
       {steps.map((label, index) => (
         <Step key={label}>
-          <StepButton color="inherit" onClick={() => setActiveStep(index)}>
-            {label}
-          </StepButton>
+          <StyledStepButton disableRipple disableTouchRipple onClick={() => setActiveStep(index)}>
+            <ButtonTypography variant="body2">{label}</ButtonTypography>
+          </StyledStepButton>
         </Step>
       ))}
-    </Stepper>
+    </StyledStepper>
   )
 }

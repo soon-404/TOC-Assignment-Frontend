@@ -1,13 +1,14 @@
-import { Box, Stack, styled, FormControl, InputLabel, Select, MenuItem } from '@mui/material'
+import { Box, styled, FormControl, InputLabel, Select, MenuItem } from '@mui/material'
 import React from 'react'
 import { Pee } from 'types'
 
-const Header = styled(Stack)`
-  width: 100%;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-`
+const Header = styled(Box)(() => ({
+  width: '100%',
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'center',
+  alignItems: 'center',
+}))
 
 interface Props {
   value: Pee

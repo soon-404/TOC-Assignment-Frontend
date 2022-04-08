@@ -11,23 +11,22 @@ declare module '@mui/material/styles' {
     xl: true
   }
 }
-export const ThemeContext = React.createContext({ toggleColorMode: () => {} })
 
-interface Props {
+interface IThemeContext {
+  toggleColorMode: () => void
+}
+
+interface ThemeProviderProps {
   children: ReactNode
 }
 
-export const ThemeProvider: React.FC<Props> = ({ children }) => {
+export const ThemeContext = React.createContext<IThemeContext>({} as IThemeContext)
+
+export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   const [mode, setMode] = React.useState<PaletteMode>('light')
 
-  const colorMode = useMemo(
-    () => ({
-      toggleColorMode: () => {
-        setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'))
-      },
-    }),
-    [],
-  )
+  const toggleColorMode = () => setMode((prev) => (prev === 'light' ? 'dark' : 'light'))
+
   const theme = useMemo(() => {
     const _theme = createTheme({
       palette: {
@@ -82,7 +81,7 @@ export const ThemeProvider: React.FC<Props> = ({ children }) => {
   }, [mode])
 
   return (
-    <ThemeContext.Provider value={colorMode}>
+    <ThemeContext.Provider value={{ toggleColorMode }}>
       <MuiThemeProvider theme={theme}>{children}</MuiThemeProvider>
     </ThemeContext.Provider>
   )
