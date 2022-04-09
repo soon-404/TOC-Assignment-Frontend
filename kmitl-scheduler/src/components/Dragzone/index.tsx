@@ -10,13 +10,17 @@ interface IDragZone {
   color: string
   blocks: SubjectBlock[]
   handleOnDrag?: (dragUpdate: IdragUpdate) => void
+  moveToSelectedBlocks: (block?: SubjectBlock) => void
 }
-export const DragZone: React.FC<IDragZone> = ({ color, blocks, handleOnDrag }) => {
+export const DragZone: React.FC<IDragZone> = ({ color, blocks, handleOnDrag, moveToSelectedBlocks }) => {
   const [open, setOpen] = useState(false)
+  const [showingBlock, setShowingBlock] = useState<SubjectBlock | undefined>()
   const [isDragging, setIsDragging] = useState(false)
+  console.log('blocks : ', blocks)
 
   const handleOnClose = () => {
     setOpen(false)
+    setShowingBlock(undefined)
   }
 
   return (
@@ -54,9 +58,9 @@ export const DragZone: React.FC<IDragZone> = ({ color, blocks, handleOnDrag }) =
                   bounceStiffness: 300,
                   bounceDamping: 25,
                 }}
-                onDoubleClick={(e) => {
+                onDoubleClick={() => {
+                  setShowingBlock(block)
                   setOpen(true)
-                  // console.log('double click')
                 }}
                 onDrag={(_, info) => {
                   setIsDragging(true)
@@ -81,12 +85,17 @@ export const DragZone: React.FC<IDragZone> = ({ color, blocks, handleOnDrag }) =
                     })
                 }}
               >
-                {block.title}
+                {block.courseName}
               </Block>
             ))}
         </Stack>
       </List>
-      <BlockDetailDialog open={open} onClose={handleOnClose} />
+      <BlockDetailDialog
+        open={open}
+        onClose={handleOnClose}
+        moveToSelectedBlocks={moveToSelectedBlocks}
+        block={showingBlock}
+      />
     </Box>
   )
 }

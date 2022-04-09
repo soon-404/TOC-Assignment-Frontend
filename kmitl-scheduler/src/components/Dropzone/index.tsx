@@ -66,7 +66,7 @@ export const DropZone: React.FC<IDropZone> = ({ color, blocks, handleDropZonesDO
                     initial={false}
                     animate={{ backgroundColor: color }}
                   >
-                    {block.title}
+                    {block.courseName}
                   </Block>
                 </Reorder.Item>
               ))}
