@@ -77,7 +77,7 @@ export const MajorSchedule = () => {
         locale={localeTh}
         data={selectedBlocks.map((block) => ({
           id: block.id,
-          title: block.title,
+          title: block.courseName,
           start: block.start,
           end: block.end,
           color: block.color,
