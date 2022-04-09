@@ -1,113 +1,102 @@
-import { css } from '@emotion/react'
-import { Box, Button, CircularProgress, styled, useMediaQuery, useTheme } from '@mui/material'
-import React from 'react'
+import { Box, Button, styled, Stack } from '@mui/material'
+import { ReactNode } from 'react'
 import { useStore } from 'hooks/useStore'
 
-const StepCardContainer = styled(Box)`
-  width: 100%;
-  background-color: rgba(13, 19, 27, 0.7);
-`
+const StepCardContainer = styled(Stack)(() => ({
+  padding: '16px 0',
+  width: '100%',
+  height: '100%',
+  alignItems: 'center',
+}))
 
-const LoadingProgress = styled(CircularProgress)`
-  height: 20px !important;
-  width: 20px !important;
-  color: #676767;
-  margin-right: 10px;
-`
+const ContentWrapper = styled(Box)(() => ({
+  padding: '32px 0',
+  width: '100%',
+  flex: 1,
+  margin: 0,
+}))
 
-type Props = {
-  onStepChange?: (step: number) => void
-  onFinish: () => void
-  onNext?: (val: number) => void
-  stepContents: React.ReactNode[]
+const ActionZone = styled(Box)(() => ({
+  width: '100%',
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+}))
+
+const StyledButton = styled(Button)(() => ({
+  textTransform: 'none',
+  borderRadius: 10,
+  border: '1px #ffffff solid',
+  backgroundColor: '#ffffff',
+  color: '#b27bec',
+  padding: '4px 16px',
+  minWidth: '100px',
+  '&:hover, &:focus': {
+    backgroundColor: '#c3c3c3',
+    border: '1px #c3c3c3 solid',
+  },
+}))
+
+type StepCardProps = {
+  stepContents: ReactNode[]
   finishText?: string
+  onFinish?: () => void
+  onNext?: (step: number) => void
+  onStepChange?: (step: number) => void
   onFirstStepBack?: () => void
-  onSecondary?: () => void
-  showSecondary?: boolean
-  secondaryText?: string
-  isWaitingTransaction?: boolean
 }
 
 export const StepCard = ({
-  onStepChange,
-  onFinish,
   stepContents,
-  onNext,
   finishText,
+  onFinish,
+  onNext,
+  onStepChange,
   onFirstStepBack,
-  onSecondary,
-  showSecondary = false,
-  secondaryText,
-  isWaitingTransaction = false,
-}: Props) => {
-  const theme = useTheme()
-  const downSm = useMediaQuery(theme.breakpoints.down('sm'))
+}: StepCardProps) => {
   const { activeStep, setActiveStep } = useStore()
+
+  const onBack = () => {
+    if (activeStep === 0 && onFirstStepBack) {
+      onFirstStepBack()
+    } else {
+      const nextStep = Math.max(0, activeStep - 1)
+      setActiveStep(nextStep)
+      if (onStepChange) {
+        onStepChange(nextStep)
+      }
+    }
+  }
+
+  const onForward = () => {
+    if (activeStep === stepContents.length - 1) {
+      if (onFinish) {
+        onFinish()
+      } else {
+        setActiveStep(0)
+      }
+    } else {
+      setActiveStep(activeStep + 1)
+      if (onStepChange) {
+        onStepChange(activeStep + 1)
+      }
+      if (onNext) {
+        onNext(activeStep)
+      }
+    }
+  }
 
   return (
     <StepCardContainer>
-      <Box flex={1} display="flex" flexDirection="column" justifyContent="space-between">
-        <Box flex={1}>{stepContents[activeStep]}</Box>
-        <Box display="flex" justifyContent="space-between" marginTop={downSm ? 4 : 0}>
-          <Button
-            css={css`
-              margin-right: 16px;
-              max-width: 120px;
-            `}
-            disabled={activeStep === 0 && !onFirstStepBack}
-            onClick={() => {
-              if (activeStep === 0 && onFirstStepBack) {
-                onFirstStepBack()
-              } else {
-                const nextStep = Math.max(0, activeStep - 1)
-                setActiveStep(nextStep)
-                if (onStepChange) {
-                  onStepChange(nextStep)
-                }
-              }
-            }}
-          >
-            Back
-          </Button>
-          <Box>
-            {activeStep === stepContents.length - 1 && showSecondary && (
-              <Button
-                variant="outlined"
-                css={css`
-                  margin-left: 16px;
-                  max-width: 140px;
-                `}
-                onClick={onSecondary}
-              >
-                {secondaryText}
-              </Button>
-            )}
-            <Button
-              variant="outlined"
-              css={css`
-                margin-left: 16px;
-                max-width: 140px;
-              `}
-              onClick={() => {
-                if (activeStep === stepContents.length - 1) {
-                  onFinish()
-                } else {
-                  setActiveStep(activeStep + 1)
-                  if (onStepChange) {
-                    onStepChange(activeStep + 1)
-                  }
-                  if (onNext) {
-                    onNext(activeStep)
-                  }
-                }
-              }}
-            >
-              {isWaitingTransaction && <LoadingProgress />}
-              {activeStep === stepContents.length - 1 ? (finishText ? finishText : 'Confirm') : 'Next'}
-            </Button>
-          </Box>
-        </Box>
-      </Box>
+      <ContentWrapper>{stepContents[activeStep]}</ContentWrapper>
+      <ActionZone>
+        <StyledButton disabled={activeStep === 0 && !onFirstStepBack} onClick={onBack}>
+          Back
+        </StyledButton>
+        <StyledButton onClick={onForward}>
+          {activeStep === stepContents.length - 1 ? (finishText ? finishText : 'finish') : 'Next'}
+        </StyledButton>
+      </ActionZone>
     </StepCardContainer>
   )
 }

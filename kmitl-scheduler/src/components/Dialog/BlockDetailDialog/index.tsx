@@ -14,8 +14,9 @@ import {
 import CloseIcon from '@mui/icons-material/Close'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import MoveDownIcon from '@mui/icons-material/MoveDown'
-import mockData from './mock'
 import { SubjectBlock } from 'types'
+
+import { subjectData } from 'mock/subjectData'
 
 interface BlockDetailDialogProps {
   open: boolean
@@ -100,7 +101,7 @@ const BlockDetailDialog: React.FC<BlockDetailDialogProps> = ({ onClose, open, bl
         คณิตศาสตร์
       </BootstrapDialogTitle>
       <DialogContent dividers>
-        {mockData.map((block) => (
+        {subjectData.map((block) => (
           <TextBox key={block.key} keyof={block.key} values={block.values} icon={block.icon ? block.icon : undefined} />
         ))}
       </DialogContent>
