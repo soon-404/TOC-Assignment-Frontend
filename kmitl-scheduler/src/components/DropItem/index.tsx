@@ -1,21 +1,29 @@
-import { Box, styled } from '@mui/material'
+import { Box, Input, styled, Typography } from '@mui/material'
 import React, { useState, useCallback } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { useStore } from 'hooks/useStore'
 
-const Root = styled(Box)`
-  height: 400px;
-  width: 100%;
-  background-color: gray;
-  display: grid;
-  place-items: center;
-`
+const Root = styled(Box)(() => ({
+  height: 400,
+  width: '100%',
+  backgroundColor: 'gray',
+  display: 'grid',
+  placeItems: 'center',
+}))
 
-const DropzoneBox = styled(Box)`
-  width: 100%;
-  height: 100%;
-  cursor: pointer;
-`
+const DropzoneBox = styled(Box)(() => ({
+  width: '100%',
+  height: '100%',
+  cursor: 'pointer',
+}))
+
+const ContentContainer = styled(Box)(() => ({
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  width: '100%',
+  height: '100%',
+}))
 
 export const DropItem = () => {
   const [files, setFiles] = useState<File[]>([])
@@ -59,7 +67,22 @@ export const DropItem = () => {
   return (
     <Root>
       <DropzoneBox {...getRootProps()}>
-        <input type="file" id="file" className="input-file" onChange={handleOnChange} {...getInputProps()} />
+        <Input
+          type="file"
+          id="file"
+          className="input-file"
+          onChange={handleOnChange}
+          {...getInputProps()}
+          // * Fixed `getInputProps` bug //
+          /**/ color={undefined} /**/
+          /**/ size={undefined} /**/
+          // *************************** //
+        />
+        <ContentContainer>
+          <Typography variant="h3" color="#ffffff" align="center">
+            upload transcript plz
+          </Typography>
+        </ContentContainer>
       </DropzoneBox>
     </Root>
   )

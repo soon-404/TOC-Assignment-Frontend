@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { Box, Stack, styled } from '@mui/material'
+import { Stack } from '@mui/material'
 import { Eventcalendar as EventCalendar, toast, localeTh } from '@mobiscroll/react'
 
 import { DragZone } from 'components/Dragzone'
@@ -7,18 +7,18 @@ import { DropZone } from 'components/Dropzone'
 
 import { isCoordsInDropBoundaries } from 'utils/dropzone'
 
-import { IDomRect, IdragUpdate, SubjectBlock } from 'types'
+import { Course, IDomRect, IdragUpdate } from 'types'
 
 import { useWindowSize } from 'hooks/useWindowSize'
 
-import { initialBlocks } from 'mock/initialBlocks'
+import { courses } from 'mock/courses'
 
 export const MajorSchedule = () => {
   const { width, height } = useWindowSize()
 
-  const [blocks, setBlocks] = useState<SubjectBlock[]>(initialBlocks)
-  const [selectedBlocks, setSelectedBlocks] = useState<SubjectBlock[]>([])
-  const [isHoverItsDropzone, setIsHoverItsDropzone] = useState<boolean>(false) // Not using now
+  const [freeCourses, setFreeCourses] = useState<Course[]>(courses)
+  const [selectedCourses, setSelectedCourses] = useState<Course[]>([])
+  const [isHoverItsDropzone, setIsHoverItsDropzone] = useState<boolean>(false)
   const [dropZonesDOMRects, setdropZonesDOMRects] = useState<IDomRect | null>()
 
   const handleOnDrag = ({ action, draggableCoords, inComingBlock }: IdragUpdate) => {
@@ -27,28 +27,34 @@ export const MajorSchedule = () => {
     const isInDropzoneBoundaries = isCoordsInDropBoundaries(draggableCoords, dropZonesDOMRects)
 
     switch (action) {
-      case 'onDrag':
+      case 'onDrag': {
         if (isInDropzoneBoundaries) {
           setIsHoverItsDropzone(true)
         } else {
           setIsHoverItsDropzone(false)
         }
-        break
-
-      case 'onDragEnd':
+        return
+      }
+      case 'onDragEnd': {
         if (isInDropzoneBoundaries) {
           setIsHoverItsDropzone(false)
-          const leftedBlocks = blocks.filter((block) => block.id !== inComingBlock.id)
-          setBlocks([...leftedBlocks])
-          setSelectedBlocks((prev) => [...prev, inComingBlock])
+          const leftedBlocks = freeCourses.filter((freeCourse) => freeCourse.id !== inComingBlock.id)
+          setFreeCourses([...leftedBlocks])
+          setSelectedCourses((prev) => [...prev, inComingBlock])
         }
-        break
+        return
+      }
     }
   }
 
   const handleDropZonesDOMRects = (zoneBoundingArea: IDomRect) => {
     setdropZonesDOMRects((prev: any) => ({ ...prev, ...zoneBoundingArea }))
   }
+
+  const handleMoveToSelectedBlocks = useCallback(
+    (course: Course) => setSelectedCourses((prev) => [...prev, course]),
+    [],
+  )
 
   const onEventClick = useCallback((event) => {
     toast({
@@ -58,14 +64,19 @@ export const MajorSchedule = () => {
 
   return (
     <Stack gap={2}>
-      <DragZone color="#f107a3" blocks={blocks} handleOnDrag={handleOnDrag} />
+      <DragZone
+        color="#f107a3"
+        courses={freeCourses}
+        handleOnDrag={handleOnDrag}
+        moveToSelectedBlocks={handleMoveToSelectedBlocks}
+      />
       <DropZone
         color="#7b2ff7"
         width={width}
         height={height}
         handleDropZonesDOMRects={handleDropZonesDOMRects}
-        blocks={selectedBlocks}
-        onReorder={setSelectedBlocks}
+        courses={selectedCourses}
+        onReorder={setSelectedCourses}
       />
       <EventCalendar
         theme="ios"
@@ -75,12 +86,13 @@ export const MajorSchedule = () => {
         dragToMove={false}
         dragToResize={false}
         locale={localeTh}
-        data={selectedBlocks.map((block) => ({
-          id: block.id,
-          title: block.courseName,
-          start: block.start,
-          end: block.end,
-          color: block.color,
+        // TODO : implement data of schedule
+        data={selectedCourses.map((course) => ({
+          id: course.id,
+          title: course.name,
+          start: '',
+          end: '',
+          color: '#f107a3',
         }))}
         view={{
           schedule: {

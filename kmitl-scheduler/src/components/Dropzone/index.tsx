@@ -1,27 +1,37 @@
-import { useEffect, useRef, useState } from 'react'
-import { Box, List, Stack } from '@mui/material'
+import { useEffect, useRef } from 'react'
+import { Stack, Paper, styled } from '@mui/material'
 import { Reorder, useMotionValue } from 'framer-motion'
 
 import { useRaisedShadow } from 'hooks/useRaiseShadow'
 
 import { Block } from 'components/Block'
 
-import { SubjectBlock, IDomRect } from 'types'
+import { Course, IDomRect } from 'types'
+
+const Root = styled(Paper)(() => ({
+  minHeight: 132,
+}))
 
 interface IDropZone {
   color: string
-  blocks: SubjectBlock[]
+  courses: Course[]
   handleDropZonesDOMRects?: (zoneBoundingArea: IDomRect) => void
   width: number
   height: number
-  onReorder: React.Dispatch<React.SetStateAction<SubjectBlock[]>>
+  onReorder: React.Dispatch<React.SetStateAction<Course[]>>
 }
 
-export const DropZone: React.FC<IDropZone> = ({ color, blocks, handleDropZonesDOMRects, width, onReorder, height }) => {
+export const DropZone: React.FC<IDropZone> = ({
+  color,
+  courses,
+  handleDropZonesDOMRects,
+  width,
+  onReorder,
+  height,
+}) => {
   const y = useMotionValue(0)
   const boxShadow = useRaisedShadow(y)
   const zoneRef = useRef<HTMLDivElement>(null)
-  const [isDragging, setIsDragging] = useState(false)
 
   useEffect(() => {
     const zoneRefEl = zoneRef.current
@@ -33,48 +43,19 @@ export const DropZone: React.FC<IDropZone> = ({ color, blocks, handleDropZonesDO
         bottom: zoneRefEl.getBoundingClientRect().bottom,
       })
     }
-  }, [width, height, blocks])
+  }, [width, height, courses])
 
   return (
-    <Box ref={zoneRef} position="relative">
-      <Box
-        sx={{
-          background: 'black',
-          opacity: '0.5',
-          borderRadius: '20px',
-          width: '100%',
-          minHeight: '150px',
-          height: '100%',
-          position: 'absolute',
-        }}
-      />
-      <List
-        sx={{
-          width: '100%',
-          height: '100%',
-          minHeight: '150px',
-          position: 'relative',
-        }}
-      >
-        <Reorder.Group axis="x" onReorder={onReorder} values={blocks} style={{ y, boxShadow }}>
-          <Stack direction="row" spacing={2} rowGap={2} flexWrap="wrap">
-            {blocks &&
-              blocks.map((block) => (
-                <Reorder.Item style={{ listStyle: 'none' }} key={block.id} value={block}>
-                  <Block
-                    drag
-                    dragConstraints={{ top: 0, bottom: 0, right: 0, left: 0 }}
-                    dragElastic={1}
-                    initial={false}
-                    animate={{ backgroundColor: color }}
-                  >
-                    {block.courseName}
-                  </Block>
-                </Reorder.Item>
-              ))}
-          </Stack>
-        </Reorder.Group>
-      </List>
-    </Box>
+    <Root ref={zoneRef}>
+      <Reorder.Group axis="x" onReorder={onReorder} values={courses} style={{ y, boxShadow, margin: 0, padding: 0 }}>
+        <Stack direction="row" spacing={2} rowGap={2} flexWrap="wrap">
+          {courses.map((course) => (
+            <Reorder.Item style={{ listStyle: 'none' }} key={course.id} value={course}>
+              <Block color={color} label={course.name} />
+            </Reorder.Item>
+          ))}
+        </Stack>
+      </Reorder.Group>
+    </Root>
   )
 }
