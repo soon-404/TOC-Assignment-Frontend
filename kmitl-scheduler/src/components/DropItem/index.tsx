@@ -2,7 +2,6 @@ import { Box, styled } from '@mui/material'
 import React, { useState, useCallback } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { useStore } from 'hooks/useStore'
-import { DragableSection } from 'components/DragableSection'
 
 const Root = styled(Box)`
   height: 400px;
@@ -62,7 +61,6 @@ export const DropItem = () => {
       <DropzoneBox {...getRootProps()}>
         <input type="file" id="file" className="input-file" onChange={handleOnChange} {...getInputProps()} />
       </DropzoneBox>
-      <DragableSection value={pee} setValue={setPee} />
     </Root>
   )
 }
