@@ -1,24 +1,24 @@
-import React, { ReactNode, useState } from 'react'
+import { createContext, ReactNode, Dispatch, useState, SetStateAction, FC } from 'react'
 import { Pee } from 'types'
 
 interface IStoreContext {
   activeStep: number
+  setActiveStep: Dispatch<SetStateAction<number>>
   pee: Pee
-  setActiveStep: (value: number) => void
-  setPee: (pee: Pee) => void
+  setPee: Dispatch<SetStateAction<Pee>>
 }
-
-export const StoreContext = React.createContext<IStoreContext>({} as IStoreContext)
 
 interface StoreProviderProps {
   children: ReactNode
 }
 
-export const StoreProvider: React.FC<StoreProviderProps> = ({ children }) => {
-  const [activeStep, _setActiveStep] = useState<number>(0)
-  const [pee, setPee] = useState<Pee>('')
+export const StoreContext = createContext<IStoreContext>({} as IStoreContext)
 
-  const setActiveStep = (value: number) => _setActiveStep(value)
+export const StoreProvider: FC<StoreProviderProps> = ({ children }) => {
+  const [activeStep, setActiveStep] = useState<number>(1) // TODO : set default '0'
+  const [pee, setPee] = useState<Pee>('3') // TODO : set default `null`
 
-  return <StoreContext.Provider value={{ activeStep, setActiveStep, pee, setPee }}>{children}</StoreContext.Provider>
+  const _value = { activeStep, setActiveStep, pee, setPee }
+
+  return <StoreContext.Provider value={_value}>{children}</StoreContext.Provider>
 }
