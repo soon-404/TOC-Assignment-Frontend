@@ -1,14 +1,14 @@
 import React from 'react'
 import { Box, Container, styled } from '@mui/material'
+import { AnimateSharedLayout } from 'framer-motion'
 
 import { Header } from 'components/Header'
 import { StepCard } from 'components/StepperCard'
 
-import { AnimateSharedLayout, m } from 'framer-motion'
-import { UploadTranscript } from './steps/UploadTranscript'
-import { MajorSchedule } from './steps/MajorSchedule'
-import { MinorSchedule } from './steps/MinorScheDule'
-import { Conclude } from './steps/Conclude'
+import { UploadTranscript } from 'pages/home/steps/UploadTranscript'
+import { MajorSchedule } from 'pages/home/steps/MajorSchedule'
+import { MinorSchedule } from 'pages/home/steps/MinorScheDule'
+import { Conclude } from 'pages/home/steps/Conclude'
 
 const HomeContainer = styled(Container)(() => ({
   display: 'flex',

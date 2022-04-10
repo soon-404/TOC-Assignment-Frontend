@@ -2,6 +2,7 @@ import { Box, CssBaseline, styled } from '@mui/material'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { ThemeProvider } from 'contexts/ThemeContext'
 import { StoreProvider } from 'contexts/StoreContext'
+import { DialogProvider } from 'contexts/DialogContext'
 import { GlobalDialog } from 'components/Dialog/GlobalDialog'
 import { Home } from 'pages/home'
 import { NotFound } from 'pages/404'
@@ -32,11 +33,13 @@ export const App: React.FC = () => {
   return (
     <ThemeProvider>
       <StoreProvider>
-        <CssBaseline />
-        <AppWrapper>
-          <GlobalDialog />
-          <Router />
-        </AppWrapper>
+        <DialogProvider>
+          <CssBaseline />
+          <AppWrapper>
+            <GlobalDialog />
+            <Router />
+          </AppWrapper>
+        </DialogProvider>
       </StoreProvider>
     </ThemeProvider>
   )

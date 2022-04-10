@@ -15,7 +15,7 @@ const LineInfo = ({ label, values, isCopyable }: LineInfoProps) => {
         {label} :
       </Typography>
       <Typography variant="body2" color="#ffffff">
-        {typeof values === 'string' ? values : values?.join(', ')}
+        {typeof values === 'string' ? values : values?.join?.(', ')}
       </Typography>
       {isCopyable && (
         <IconButton>

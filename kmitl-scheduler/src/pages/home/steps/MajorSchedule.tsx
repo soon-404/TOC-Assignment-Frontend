@@ -47,9 +47,9 @@ export const MajorSchedule = () => {
     }
   }
 
-  const handleDropZonesDOMRects = (zoneBoundingArea: IDomRect) => {
+  const handleDropZonesDOMRects = useCallback((zoneBoundingArea: IDomRect) => {
     setdropZonesDOMRects((prev: any) => ({ ...prev, ...zoneBoundingArea }))
-  }
+  }, [])
 
   const handleMoveToSelectedBlocks = useCallback(
     (course: Course) => setSelectedCourses((prev) => [...prev, course]),
@@ -61,6 +61,8 @@ export const MajorSchedule = () => {
       message: event.event.title,
     })
   }, [])
+
+  console.log('MajorSchedule rerender')
 
   return (
     <Stack gap={2}>
