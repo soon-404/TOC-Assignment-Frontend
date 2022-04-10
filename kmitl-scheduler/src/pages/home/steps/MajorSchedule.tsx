@@ -1,84 +1,29 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { Stack } from '@mui/material'
 import { Eventcalendar as EventCalendar, toast, localeTh } from '@mobiscroll/react'
 
 import { DragZone } from 'components/Dragzone'
 import { DropZone } from 'components/Dropzone'
 
-import { isCoordsInDropBoundaries } from 'utils/dropzone'
+import { useStore } from 'hooks/useStore'
 
-import { Course, IDomRect, IdragUpdate } from 'types'
-
-import { useWindowSize } from 'hooks/useWindowSize'
-
-import { courses } from 'mock/courses'
+import { IDomRect } from 'types'
 
 export const MajorSchedule = () => {
-  const { width, height } = useWindowSize()
+  const { freeCourses, selectedCourses } = useStore()
 
-  const [freeCourses, setFreeCourses] = useState<Course[]>(courses)
-  const [selectedCourses, setSelectedCourses] = useState<Course[]>([])
-  const [isHoverItsDropzone, setIsHoverItsDropzone] = useState<boolean>(false)
-  const [dropZonesDOMRects, setdropZonesDOMRects] = useState<IDomRect | null>()
+  const [dropZonesDomRects, setDropZonesDomRects] = useState<IDomRect | null>(null)
 
-  const handleOnDrag = ({ action, draggableCoords, inComingBlock }: IdragUpdate) => {
-    if (!dropZonesDOMRects) return
-
-    const isInDropzoneBoundaries = isCoordsInDropBoundaries(draggableCoords, dropZonesDOMRects)
-
-    switch (action) {
-      case 'onDrag': {
-        if (isInDropzoneBoundaries) {
-          setIsHoverItsDropzone(true)
-        } else {
-          setIsHoverItsDropzone(false)
-        }
-        return
-      }
-      case 'onDragEnd': {
-        if (isInDropzoneBoundaries) {
-          setIsHoverItsDropzone(false)
-          const leftedBlocks = freeCourses.filter((freeCourse) => freeCourse.id !== inComingBlock.id)
-          setFreeCourses([...leftedBlocks])
-          setSelectedCourses((prev) => [...prev, inComingBlock])
-        }
-        return
-      }
-    }
-  }
-
-  const handleDropZonesDOMRects = useCallback((zoneBoundingArea: IDomRect) => {
-    setdropZonesDOMRects((prev: any) => ({ ...prev, ...zoneBoundingArea }))
-  }, [])
-
-  const handleMoveToSelectedBlocks = useCallback(
-    (course: Course) => setSelectedCourses((prev) => [...prev, course]),
-    [],
-  )
-
-  const onEventClick = useCallback((event) => {
-    toast({
-      message: event.event.title,
-    })
-  }, [])
-
-  console.log('MajorSchedule rerender')
+  const onEventClick = useCallback((event) => toast({ message: event.event.title }), [])
 
   return (
     <Stack gap={2}>
-      <DragZone
-        color="#f107a3"
-        courses={freeCourses}
-        handleOnDrag={handleOnDrag}
-        moveToSelectedBlocks={handleMoveToSelectedBlocks}
-      />
+      <DragZone color="#f107a3" courses={freeCourses} dropZonesDomRects={dropZonesDomRects} />
       <DropZone
         color="#7b2ff7"
-        width={width}
-        height={height}
-        handleDropZonesDOMRects={handleDropZonesDOMRects}
         courses={selectedCourses}
-        onReorder={setSelectedCourses}
+        dropZonesDomRects={dropZonesDomRects}
+        setDropZonesDomRects={(dropZonesDomRects: IDomRect) => setDropZonesDomRects(dropZonesDomRects)}
       />
       <EventCalendar
         theme="ios"
