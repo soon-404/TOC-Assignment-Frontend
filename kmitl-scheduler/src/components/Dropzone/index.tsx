@@ -2,8 +2,9 @@ import { useEffect, useRef } from 'react'
 import { Paper, styled } from '@mui/material'
 import { PanInfo } from 'framer-motion'
 
-import { useStore } from 'hooks/useStore'
+import { useStore, useDialog } from 'hooks/useStore'
 import { Block } from 'components/Block'
+import { BlockDetailDialog } from 'components/Dialog/BlockDetailDialog'
 import { isCoordsInDropBoundaries } from 'utils/dropzone'
 import { Course, DomRect } from 'types'
 
@@ -26,6 +27,7 @@ interface IDropZone {
 }
 
 export const DropZone: React.FC<IDropZone> = ({ color, courses = [], dropZonesDomRects, setDropZonesDomRects }) => {
+  const { open } = useDialog()
   const { selectedCourses, setFreeCourses, setSelectedCourses } = useStore()
 
   const zoneRef = useRef<HTMLDivElement | null>(null)
@@ -70,6 +72,7 @@ export const DropZone: React.FC<IDropZone> = ({ color, courses = [], dropZonesDo
           color={color}
           label={course.name}
           isCoordsInBox={isCoordsInBox}
+          onDoubleClick={() => open(<BlockDetailDialog course={course} />)}
           onDragEnd={(_, info) => handleOnDragEnd(course, info)}
         />
       ))}
