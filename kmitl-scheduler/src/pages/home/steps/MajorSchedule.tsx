@@ -7,12 +7,12 @@ import { DropZone } from 'components/Dropzone'
 
 import { useStore } from 'hooks/useStore'
 
-import { IDomRect } from 'types'
+import { DomRect } from 'types'
 
 export const MajorSchedule = () => {
   const { freeCourses, selectedCourses } = useStore()
 
-  const [dropZonesDomRects, setDropZonesDomRects] = useState<IDomRect | null>(null)
+  const [dropZonesDomRects, setDropZonesDomRects] = useState<DomRect | null>(null)
 
   const onEventClick = useCallback((event) => toast({ message: event.event.title }), [])
 
@@ -23,7 +23,7 @@ export const MajorSchedule = () => {
         color="#7b2ff7"
         courses={selectedCourses}
         dropZonesDomRects={dropZonesDomRects}
-        setDropZonesDomRects={(dropZonesDomRects: IDomRect) => setDropZonesDomRects(dropZonesDomRects)}
+        setDropZonesDomRects={(dropZonesDomRects: DomRect) => setDropZonesDomRects(dropZonesDomRects)}
       />
       <EventCalendar
         theme="ios"

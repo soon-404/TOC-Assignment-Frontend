@@ -5,7 +5,7 @@ import { PanInfo } from 'framer-motion'
 import { useStore } from 'hooks/useStore'
 import { Block } from 'components/Block'
 import { isCoordsInDropBoundaries } from 'utils/dropzone'
-import { Course, IDomRect } from 'types'
+import { Course, DomRect } from 'types'
 
 const Root = styled(Paper)(() => ({
   gap: 16,
@@ -21,8 +21,8 @@ const Root = styled(Paper)(() => ({
 interface IDropZone {
   color: string
   courses?: Course[]
-  dropZonesDomRects: IDomRect | null
-  setDropZonesDomRects: (dropZonesDomRects: IDomRect) => void
+  dropZonesDomRects: DomRect | null
+  setDropZonesDomRects: (dropZonesDomRects: DomRect) => void
 }
 
 export const DropZone: React.FC<IDropZone> = ({ color, courses = [], dropZonesDomRects, setDropZonesDomRects }) => {

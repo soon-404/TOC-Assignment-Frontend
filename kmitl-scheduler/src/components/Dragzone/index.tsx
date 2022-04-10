@@ -5,7 +5,7 @@ import { Block } from 'components/Block'
 import { BlockDetailDialog } from 'components/Dialog/BlockDetailDialog'
 import { useDialog, useStore } from 'hooks/useStore'
 import { isCoordsInDropBoundaries } from 'utils/dropzone'
-import { Course, IDomRect } from 'types'
+import { Course, DomRect } from 'types'
 
 const Root = styled(Paper)(() => ({
   gap: 16,
@@ -21,7 +21,7 @@ const Root = styled(Paper)(() => ({
 interface DragZoneProps {
   color: string
   courses?: Course[]
-  dropZonesDomRects: IDomRect | null
+  dropZonesDomRects: DomRect | null
 }
 
 export const DragZone = ({ color, courses = [], dropZonesDomRects }: DragZoneProps) => {

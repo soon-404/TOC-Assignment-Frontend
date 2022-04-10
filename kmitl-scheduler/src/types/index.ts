@@ -1,5 +1,3 @@
-export * from 'types/dropzone'
-
 export type Pee = '1' | '2' | '3' | '4' | null
 
 export type Section = {
@@ -53,4 +51,16 @@ export interface ApiData {
   credit_counter: CollageCredit
   credit_recommends: CollageCredit
   subjects: Subject[][]
+}
+
+export interface Coords {
+  x: number
+  y: number
+}
+
+export interface DomRect {
+  top: number
+  left: number
+  right: number
+  bottom: number
 }
