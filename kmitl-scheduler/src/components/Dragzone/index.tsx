@@ -14,29 +14,27 @@ const Root = styled(Paper)(() => ({
   alignItems: 'center',
   position: 'relative',
   width: '100%',
-  minHeight: 132,
+  minHeight: 132, // * block height(100) + padding(32)
 }))
 
-interface IDragZone {
+interface DragZoneProps {
   color: string
   courses: Course[]
   handleOnDrag: (dragUpdate: IdragUpdate) => void
   moveToSelectedBlocks: (course: Course) => void
 }
 
-export const DragZone: React.FC<IDragZone> = ({
-  color,
-  courses,
-  handleOnDrag: onDragCallback,
-  moveToSelectedBlocks,
-}) => {
+export const DragZone = ({ color, courses, handleOnDrag: onDragCallback, moveToSelectedBlocks }: DragZoneProps) => {
   const { open } = useDialog()
 
   const [isDragging, setIsDragging] = useState(false) // * Unuse now
 
-  const handleOnDoubleClick = useCallback((course: Course) => {
-    open(() => <BlockDetailDialog course={course} onAddToSchedule={() => moveToSelectedBlocks(course)} />)
-  }, [])
+  const handleOnDoubleClick = useCallback(
+    (course: Course) => {
+      open(<BlockDetailDialog course={course} onAddToSchedule={() => moveToSelectedBlocks(course)} />)
+    },
+    [moveToSelectedBlocks],
+  )
 
   const handleOnDrag = (course: Course, info: PanInfo) => {
     setIsDragging(true)
