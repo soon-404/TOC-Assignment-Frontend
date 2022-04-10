@@ -1,6 +1,7 @@
 import { Box, Button, IconButton, Typography } from '@mui/material'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import { Course } from 'types'
+import { useStore } from 'hooks/useStore'
 
 interface LineInfoProps {
   label: string
@@ -32,12 +33,13 @@ type CopyableKey = Extract<KeyOfBlockDetailPickOut, 'id' | 'name'>
 
 interface BlockDetailDialogProps {
   course: Course
-  onAddToSchedule: () => void
 }
 
 const CopyableKey: string[] = ['id', 'name'] as CopyableKey[]
 
-export const BlockDetailDialog = ({ course, onAddToSchedule }: BlockDetailDialogProps) => {
+export const BlockDetailDialog = ({ course }: BlockDetailDialogProps) => {
+  const { setSelectedCourses } = useStore()
+
   const filteredCourseKey: BlockDetailPickOut = course
 
   return (
@@ -51,7 +53,7 @@ export const BlockDetailDialog = ({ course, onAddToSchedule }: BlockDetailDialog
           isCopyable={CopyableKey.includes(key)}
         />
       ))}
-      <Button variant="contained" onClick={onAddToSchedule}>
+      <Button variant="contained" onClick={() => setSelectedCourses((prev) => [...prev, course])}>
         add to schedule
       </Button>
     </Box>

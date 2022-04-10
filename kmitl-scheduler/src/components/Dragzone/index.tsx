@@ -1,10 +1,11 @@
-import { useCallback, useState } from 'react'
+import { PanInfo } from 'framer-motion'
 import { styled, Paper } from '@mui/material'
+
 import { Block } from 'components/Block'
 import { BlockDetailDialog } from 'components/Dialog/BlockDetailDialog'
-import { PanInfo } from 'framer-motion'
-import { Course, IdragUpdate } from 'types'
-import { useDialog } from 'hooks/useStore'
+import { useDialog, useStore } from 'hooks/useStore'
+import { isCoordsInDropBoundaries } from 'utils/dropzone'
+import { Course, IDomRect } from 'types'
 
 const Root = styled(Paper)(() => ({
   gap: 16,
@@ -14,57 +15,36 @@ const Root = styled(Paper)(() => ({
   alignItems: 'center',
   position: 'relative',
   width: '100%',
-  minHeight: 132,
+  minHeight: 148, // * block height(100) + padding(48)
 }))
 
-interface IDragZone {
+interface DragZoneProps {
   color: string
-  courses: Course[]
-  handleOnDrag: (dragUpdate: IdragUpdate) => void
-  moveToSelectedBlocks: (course: Course) => void
+  courses?: Course[]
+  dropZonesDomRects: IDomRect | null
 }
 
-export const DragZone: React.FC<IDragZone> = ({
-  color,
-  courses,
-  handleOnDrag: onDragCallback,
-  moveToSelectedBlocks,
-}) => {
+export const DragZone = ({ color, courses = [], dropZonesDomRects }: DragZoneProps) => {
   const { open } = useDialog()
-
-  const [isDragging, setIsDragging] = useState(false) // * Unuse now
-
-  const handleOnDoubleClick = useCallback((course: Course) => {
-    open(() => <BlockDetailDialog course={course} onAddToSchedule={() => moveToSelectedBlocks(course)} />)
-  }, [])
-
-  const handleOnDrag = (course: Course, info: PanInfo) => {
-    setIsDragging(true)
-    onDragCallback({
-      action: 'onDrag',
-      draggableCoords: { x: info.point.x, y: info.point.y },
-      inComingBlock: course,
-    })
-  }
+  const { freeCourses, setFreeCourses, setSelectedCourses } = useStore()
 
   const handleOnDragEnd = (course: Course, info: PanInfo) => {
-    setIsDragging(false)
-    onDragCallback({
-      action: 'onDragEnd',
-      draggableCoords: { x: info.point.x, y: info.point.y },
-      inComingBlock: course,
-    })
+    if (!dropZonesDomRects) return
+    if (isCoordsInDropBoundaries({ x: info.point.x, y: info.point.y }, dropZonesDomRects)) {
+      const leftedBlocks = freeCourses.filter((freeCourse) => freeCourse.id !== course.id)
+      setFreeCourses([...leftedBlocks])
+      setSelectedCourses((prev) => [...prev, course])
+    }
   }
 
   return (
     <Root>
-      {courses?.map((course) => (
+      {courses.map((course) => (
         <Block
           key={course.id}
           color={color}
           label={course.name}
-          onDoubleClick={() => handleOnDoubleClick(course)}
-          onDrag={(_, info) => handleOnDrag(course, info)}
+          onDoubleClick={() => open(<BlockDetailDialog course={course} />)}
           onDragEnd={(_, info) => handleOnDragEnd(course, info)}
         />
       ))}
