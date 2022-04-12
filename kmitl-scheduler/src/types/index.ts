@@ -2,6 +2,9 @@ export * from 'types/dropzone'
 
 export type Pee = '1' | '2' | '3' | '4' | ''
 
+type Semester = '1' | '2'
+type SubjectType = 'ทฤษฎี' | 'ปฏิบัติ'
+
 export interface SubjectBlock {
   id: string
   start: string
@@ -18,7 +21,7 @@ export interface SubjectBlock {
   }
   midterm: string
   note: string
-  restriction: Array<string | undefined>
+  restriction: string[]
   room: string
   schedule: string[]
   section: string[]
