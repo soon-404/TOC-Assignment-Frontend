@@ -1,88 +1,39 @@
-import React, { ReactNode, useMemo } from 'react'
-import { PaletteMode, createTheme, ThemeProvider as MuiThemeProvider } from '@mui/material'
+import { ReactNode, useMemo, createContext, useState, FC } from 'react'
+import { ThemeProvider as MuiThemeProvider, Theme } from '@mui/material'
 
-declare module '@mui/material/styles' {
-  interface BreakpointOverrides {
-    xxs: true
-    xs: true
-    sm: true
-    md: true
-    lg: true
-    xl: true
-  }
-}
+import { theme as mainTheme } from 'themes/main'
 
 interface IThemeContext {
-  toggleColorMode: () => void
+  setTheme: (theme: ThemeMode) => void
 }
 
 interface ThemeProviderProps {
   children: ReactNode
 }
 
-export const ThemeContext = React.createContext<IThemeContext>({} as IThemeContext)
+export type ThemeMode = 'main' | 'someTheme'
 
-export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
-  const [mode, setMode] = React.useState<PaletteMode>('light')
+export const ThemeContext = createContext<IThemeContext>({} as IThemeContext)
 
-  const toggleColorMode = () => setMode((prev) => (prev === 'light' ? 'dark' : 'light'))
+export const ThemeProvider: FC<ThemeProviderProps> = ({ children }) => {
+  const [themeName, _setThemeName] = useState<ThemeMode>('main')
 
-  const theme = useMemo(() => {
-    const _theme = createTheme({
-      palette: {
-        mode,
-      },
-      typography: {
-        fontFamily: ['Noto Sans Thai', 'Roboto'].join(','),
-        // h1: {
-        //   fontSize: '40px',
-        //   fontWeight: 'bold',
-        //   fontStyle: 'normal',
-        // },
-        // h2: {
-        //   fontSize: '32px',
-        //   fontWeight: 'bold',
-        //   fontStyle: 'normal',
-        // },
-        // h3: {
-        //   fontSize: '28px',
-        //   fontWeight: 'bold',
-        //   fontStyle: 'normal',
-        // },
-        // h4: {
-        //   fontSize: '20px',
-        //   fontWeight: 'bold',
-        //   fontStyle: 'normal',
-        // },
-        // h5: {
-        //   fontSize: '16px',
-        //   fontWeight: 'extraBold',
-        //   fontStyle: 'normal',
-        // },
-        // h6: {
-        //   fontSize: '12px',
-        //   fontWeight: 'extraBold',
-        //   fontStyle: 'normal',
-        // },
-      },
-      breakpoints: {
-        values: {
-          xxs: 0,
-          xs: 464,
-          sm: 640,
-          md: 768,
-          lg: 1024,
-          xl: 1536,
-        },
-      },
-    })
+  const setTheme = (theme: ThemeMode) => _setThemeName(theme)
 
-    return _theme
-  }, [mode])
+  const themeToProvider: Theme = useMemo(() => {
+    switch (themeName) {
+      case 'main':
+        return mainTheme
+      case 'someTheme':
+        return mainTheme // * For new theme in the future
+      default:
+        return mainTheme
+    }
+  }, [themeName])
 
   return (
-    <ThemeContext.Provider value={{ toggleColorMode }}>
-      <MuiThemeProvider theme={theme}>{children}</MuiThemeProvider>
+    <ThemeContext.Provider value={{ setTheme }}>
+      <MuiThemeProvider theme={themeToProvider}>{children}</MuiThemeProvider>
     </ThemeContext.Provider>
   )
 }

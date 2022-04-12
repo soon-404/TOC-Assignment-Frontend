@@ -1,6 +1,6 @@
-import { Icoords, IDomRect } from 'types'
+import { Coords, DomRect } from 'types'
 
-export const isCoordsInDropBoundaries = (draggableCoords: Icoords, dropZonesDOMRect: IDomRect) => {
+export const isCoordsInDropBoundaries = (draggableCoords: Coords, dropZonesDOMRect: DomRect) => {
   const isDraggedXInRange = dropZonesDOMRect.left <= draggableCoords.x && draggableCoords.x <= dropZonesDOMRect.right
   const isDraggedYInRange = dropZonesDOMRect.top <= draggableCoords.y && draggableCoords.y <= dropZonesDOMRect.bottom
 

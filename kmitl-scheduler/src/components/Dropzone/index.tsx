@@ -1,80 +1,81 @@
-import { useEffect, useRef, useState } from 'react'
-import { Box, List, Stack } from '@mui/material'
-import { Reorder, useMotionValue } from 'framer-motion'
+import { useEffect, useRef } from 'react'
+import { Paper, styled } from '@mui/material'
+import { PanInfo } from 'framer-motion'
 
-import { useRaisedShadow } from 'hooks/useRaiseShadow'
-
+import { useStore, useDialog } from 'hooks/useStore'
 import { Block } from 'components/Block'
+import { BlockDetailDialog } from 'components/Dialog/BlockDetailDialog'
+import { isCoordsInDropBoundaries } from 'utils/dropzone'
+import { Course, DomRect } from 'types'
 
-import { SubjectBlock, IDomRect } from 'types'
+const Root = styled(Paper)(() => ({
+  gap: 16,
+  display: 'flex',
+  flexFlow: 'row wrap',
+  justifyContent: 'flex-start',
+  alignItems: 'center',
+  position: 'relative',
+  width: '100%',
+  minHeight: 148, // * block height(100) + padding(48)
+}))
 
 interface IDropZone {
   color: string
-  blocks: SubjectBlock[]
-  handleDropZonesDOMRects?: (zoneBoundingArea: IDomRect) => void
-  width: number
-  height: number
-  onReorder: React.Dispatch<React.SetStateAction<SubjectBlock[]>>
+  courses?: Course[]
+  dropZonesDomRects: DomRect | null
+  setDropZonesDomRects: (dropZonesDomRects: DomRect) => void
 }
 
-export const DropZone: React.FC<IDropZone> = ({ color, blocks, handleDropZonesDOMRects, width, onReorder, height }) => {
-  const y = useMotionValue(0)
-  const boxShadow = useRaisedShadow(y)
-  const zoneRef = useRef<HTMLDivElement>(null)
-  const [isDragging, setIsDragging] = useState(false)
+export const DropZone: React.FC<IDropZone> = ({ color, courses = [], dropZonesDomRects, setDropZonesDomRects }) => {
+  const { open } = useDialog()
+  const { selectedCourses, setFreeCourses, setSelectedCourses } = useStore()
+
+  const zoneRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
-    const zoneRefEl = zoneRef.current
-    if (zoneRefEl && handleDropZonesDOMRects) {
-      handleDropZonesDOMRects({
+    const resizeHandler = () => {
+      const zoneRefEl = zoneRef.current
+      if (!zoneRefEl) return
+      setDropZonesDomRects({
         top: zoneRefEl.getBoundingClientRect().top + window.scrollY,
         left: zoneRefEl.getBoundingClientRect().left,
         right: zoneRefEl.getBoundingClientRect().right,
         bottom: zoneRefEl.getBoundingClientRect().bottom,
       })
     }
-  }, [width, height, blocks])
+
+    resizeHandler()
+
+    window.addEventListener('resize', resizeHandler)
+    return () => window.removeEventListener('resize', resizeHandler)
+  }, [zoneRef])
+
+  const isCoordsInBox = (info: PanInfo): boolean => {
+    if (!dropZonesDomRects) return true
+    return isCoordsInDropBoundaries({ x: info.point.x, y: info.point.y }, dropZonesDomRects)
+  }
+
+  const handleOnDragEnd = (course: Course, info: PanInfo) => {
+    if (!dropZonesDomRects) return
+    if (!isCoordsInDropBoundaries({ x: info.point.x, y: info.point.y }, dropZonesDomRects)) {
+      const leftedBlocks = selectedCourses.filter((selectedCourse) => selectedCourse.id !== course.id)
+      setSelectedCourses([...leftedBlocks])
+      setFreeCourses((prev) => [...prev, course])
+    }
+  }
 
   return (
-    <Box ref={zoneRef} position="relative">
-      <Box
-        sx={{
-          background: 'black',
-          opacity: '0.5',
-          borderRadius: '20px',
-          width: '100%',
-          minHeight: '150px',
-          height: '100%',
-          position: 'absolute',
-        }}
-      />
-      <List
-        sx={{
-          width: '100%',
-          height: '100%',
-          minHeight: '150px',
-          position: 'relative',
-        }}
-      >
-        <Reorder.Group axis="x" onReorder={onReorder} values={blocks} style={{ y, boxShadow }}>
-          <Stack direction="row" spacing={2} rowGap={2} flexWrap="wrap">
-            {blocks &&
-              blocks.map((block) => (
-                <Reorder.Item style={{ listStyle: 'none' }} key={block.id} value={block}>
-                  <Block
-                    drag
-                    dragConstraints={{ top: 0, bottom: 0, right: 0, left: 0 }}
-                    dragElastic={1}
-                    initial={false}
-                    animate={{ backgroundColor: color }}
-                  >
-                    {block.courseName}
-                  </Block>
-                </Reorder.Item>
-              ))}
-          </Stack>
-        </Reorder.Group>
-      </List>
-    </Box>
+    <Root ref={zoneRef}>
+      {courses.map((course) => (
+        <Block
+          key={course.id}
+          color={color}
+          label={course.name}
+          isCoordsInBox={isCoordsInBox}
+          onDoubleClick={() => open(<BlockDetailDialog course={course} />)}
+          onDragEnd={(_, info) => handleOnDragEnd(course, info)}
+        />
+      ))}
+    </Root>
   )
 }
