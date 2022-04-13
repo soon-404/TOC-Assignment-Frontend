@@ -30,7 +30,7 @@ export const DropItem = () => {
   const [isError, setIsError] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
 
-  const { pee, setPee } = useStore()
+  const { classYear, setClassYear } = useStore()
 
   const handleOnChange = (e: React.FormEvent<HTMLInputElement>): void => {
     const input = e.currentTarget
