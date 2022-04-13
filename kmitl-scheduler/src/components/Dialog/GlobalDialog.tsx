@@ -25,9 +25,9 @@ export const GlobalDialog = () => {
   if (!dialogContent) return null
 
   return (
-    <DialogMui onClose={close} open={isDialogOpen}>
+    <DialogMui onClose={close} open={isDialogOpen} PaperProps={{ style: { backgroundColor: 'white' } }}>
       <CloseButton onClick={close} />
-      <Content dividers>{dialogContent}</Content>
+      <Content>{dialogContent}</Content>
     </DialogMui>
   )
 }

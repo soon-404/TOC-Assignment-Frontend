@@ -28,13 +28,13 @@ export const StoreProvider: FC<StoreProviderProps> = ({ children }) => {
   const [selectedCourses, setSelectedCourses] = useState<Course[]>([])
 
   const _value = {
-    activeStep,
+    activeStep, //  step การทำงานที่กำลัง active อยู่ตอนนี้
     setActiveStep,
-    pee,
+    pee, //  ชั้นปีการศึกษา
     setPee,
-    freeCourses,
+    freeCourses, // วิชาที่ยังไม่โดนเลือก
     setFreeCourses,
-    selectedCourses,
+    selectedCourses, // วิชาที่ user เลือก
     setSelectedCourses,
   }
 

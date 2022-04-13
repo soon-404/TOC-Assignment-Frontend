@@ -4,13 +4,13 @@ export type Section = {
   id: string
   building?: string
   room?: string
-  schedule: string[]
+  schedule: DateRange[]
   type: string
 }
 
 export type DateRange = {
-  start: string
-  end: string
+  start: number
+  end: number
 }
 
 export type Subject = {
