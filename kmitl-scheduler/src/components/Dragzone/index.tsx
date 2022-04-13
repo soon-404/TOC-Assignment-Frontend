@@ -16,6 +16,14 @@ const Root = styled(Paper)(() => ({
   position: 'relative',
   width: '100%',
   minHeight: 148, // * block height(100) + padding(48)
+
+  // * In case want to overflow-y-scroll
+  // maxHeight: '400px',
+  // overflowY: 'scroll',
+  // scrollbarWidth: 'none',
+  // '&::-webkit-scrollbar': {
+  //   display: 'none',
+  // },
 }))
 
 interface DragZoneProps {
@@ -28,9 +36,9 @@ export const DragZone = ({ color, courses = [], dropZonesDomRects }: DragZonePro
   const { open } = useDialog()
   const { freeCourses, setFreeCourses, setSelectedCourses } = useStore()
 
-  const handleOnDragEnd = (course: Course, info: PanInfo) => {
+  const handleOnDragEnd = (course: Course, { point }: PanInfo) => {
     if (!dropZonesDomRects) return
-    if (isCoordsInDropBoundaries({ x: info.point.x, y: info.point.y }, dropZonesDomRects)) {
+    if (isCoordsInDropBoundaries(point, dropZonesDomRects)) {
       const leftedBlocks = freeCourses.filter((freeCourse) => freeCourse.id !== course.id)
       setFreeCourses([...leftedBlocks])
       setSelectedCourses((prev) => [...prev, course])

@@ -2,8 +2,9 @@ import { styled } from '@mui/system'
 import { motion, PanInfo } from 'framer-motion'
 import { ReactNode, useState } from 'react'
 
-export const Root = styled(motion.div)(() => ({
+const StyledBlock = styled(motion.div)(() => ({
   display: 'flex',
+  position: 'relative',
   justifyContent: 'center',
   alignItems: 'center',
   width: 'auto',
@@ -14,6 +15,15 @@ export const Root = styled(motion.div)(() => ({
   color: 'white',
   padding: '4px 16px',
   cursor: 'grab',
+}))
+
+const BlockClone = styled(StyledBlock)(() => ({
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  zIndex: 696969,
 }))
 
 type FramerEventType = MouseEvent | TouchEvent | PointerEvent
@@ -30,11 +40,11 @@ export const Block = ({ label, color = 'white', isCoordsInBox, ...event }: Block
   const [pale, setPale] = useState<boolean>(false)
 
   return (
-    <Root
+    <StyledBlock
       drag={true}
       initial={false}
       animate={{ backgroundColor: color }}
-      whileDrag={{ zIndex: 9999, cursor: 'grabbing' }}
+      whileDrag={{ zIndex: 6969, cursor: 'grabbing' }}
       dragConstraints={{ top: 0, left: 0, right: 0, bottom: 0 }}
       dragElastic={1}
       dragTransition={{
@@ -46,6 +56,7 @@ export const Block = ({ label, color = 'white', isCoordsInBox, ...event }: Block
       {...event}
     >
       {label}
-    </Root>
+      <BlockClone />
+    </StyledBlock>
   )
 }

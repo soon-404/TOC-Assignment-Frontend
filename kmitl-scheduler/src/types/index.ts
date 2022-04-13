@@ -57,11 +57,6 @@ export interface ApiTablesData {
   success: boolean
 }
 
-export interface Coords {
-  x: number
-  y: number
-}
-
 export interface DomRect {
   top: number
   left: number
