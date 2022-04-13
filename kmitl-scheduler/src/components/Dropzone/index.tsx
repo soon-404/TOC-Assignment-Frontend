@@ -28,7 +28,7 @@ interface IDropZone {
 
 export const DropZone: React.FC<IDropZone> = ({ color, courses = [], dropZonesDomRects, setDropZonesDomRects }) => {
   const { open } = useDialog()
-  const { selectedCourses, setFreeCourses, setSelectedCourses } = useStore()
+  const { freeCourses, selectedCourses, setFreeCourses, setSelectedCourses } = useStore()
 
   const zoneRef = useRef<HTMLDivElement | null>(null)
 
@@ -40,7 +40,7 @@ export const DropZone: React.FC<IDropZone> = ({ color, courses = [], dropZonesDo
         top: zoneRefEl.getBoundingClientRect().top + window.scrollY,
         left: zoneRefEl.getBoundingClientRect().left,
         right: zoneRefEl.getBoundingClientRect().right,
-        bottom: zoneRefEl.getBoundingClientRect().bottom,
+        bottom: zoneRefEl.getBoundingClientRect().bottom + window.scrollY,
       })
     }
 
@@ -48,16 +48,16 @@ export const DropZone: React.FC<IDropZone> = ({ color, courses = [], dropZonesDo
 
     window.addEventListener('resize', resizeHandler)
     return () => window.removeEventListener('resize', resizeHandler)
-  }, [zoneRef])
+  }, [zoneRef, freeCourses, selectedCourses])
 
-  const isCoordsInBox = (info: PanInfo): boolean => {
+  const isCoordsInBox = ({ point }: PanInfo): boolean => {
     if (!dropZonesDomRects) return true
-    return isCoordsInDropBoundaries({ x: info.point.x, y: info.point.y }, dropZonesDomRects)
+    return isCoordsInDropBoundaries(point, dropZonesDomRects)
   }
 
-  const handleOnDragEnd = (course: Course, info: PanInfo) => {
+  const handleOnDragEnd = (course: Course, { point }: PanInfo) => {
     if (!dropZonesDomRects) return
-    if (!isCoordsInDropBoundaries({ x: info.point.x, y: info.point.y }, dropZonesDomRects)) {
+    if (!isCoordsInDropBoundaries(point, dropZonesDomRects)) {
       const leftedBlocks = selectedCourses.filter((selectedCourse) => selectedCourse.id !== course.id)
       setSelectedCourses([...leftedBlocks])
       setFreeCourses((prev) => [...prev, course])

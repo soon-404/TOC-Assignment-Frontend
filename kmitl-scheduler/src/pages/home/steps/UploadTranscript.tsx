@@ -9,14 +9,14 @@ const DropItemWrapper = styled(Box)(() => ({
 }))
 
 export const UploadTranscript = () => {
-  const { pee } = useStore()
+  const { classYear } = useStore()
 
   return (
     <Box>
       <DropItemWrapper>
         <DropItem />
       </DropItemWrapper>
-      {!!pee && (
+      {!!classYear && (
         <Paper>
           <Box mb={2}>
             <Typography variant="body1" color="#ffffff" align="center">

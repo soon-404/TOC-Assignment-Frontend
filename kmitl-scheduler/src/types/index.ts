@@ -1,29 +1,27 @@
-export type Pee = '1' | '2' | '3' | '4' | null
+export type ClassYear = '1' | '2' | '3' | '4'
 
-export type Section = {
-  id: string
-  building?: string
-  room?: string
-  schedule: string[]
-  type: string
-}
+export type CourseType = 'department' | 'language' | 'human' | 'social' | 'sciMath' | 'free'
+
+export type Credit = Partial<{ [courseType in CourseType]: number }>
 
 export type DateRange = {
   start: string
   end: string
 }
 
-export type Subject = {
+export type Section = {
   id: string
-  course_type: string
-  name: string
+  building?: string
+  room?: string
+  schedule: DateRange[]
+  type: string
 }
 
 export type Course = {
   id: string
   name: string
-  class_year: string
-  course_type: string
+  class_year: ClassYear
+  course_type: CourseType
   credit: string
   midterm?: string | DateRange
   final?: string | DateRange
@@ -35,27 +33,28 @@ export type Course = {
   year: string
 }
 
-export type CollageCredit = {
-  ภาค: number
-  ภาษา: number
-  มนุษย์: number
-  วิทย์: number
-  สังคม: number
-  เสรี: number
+export type Subject = {
+  id: string
+  name: string
+  course_type: CourseType
 }
 
-export interface ApiData {
+export interface TranscriptData {
   name: string
   student_id: string
   course_recommends: Course[]
-  credit_counter: CollageCredit
-  credit_recommends: CollageCredit
+  credit_counter: Credit
   subjects: Subject[][]
 }
 
-export interface Coords {
-  x: number
-  y: number
+export interface ApiTranscriptData {
+  data: TranscriptData
+  success: boolean
+}
+
+export interface ApiTablesData {
+  data: Course[]
+  success: boolean
 }
 
 export interface DomRect {

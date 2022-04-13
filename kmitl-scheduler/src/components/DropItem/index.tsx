@@ -1,12 +1,12 @@
-import { Box, Input, styled, Typography } from '@mui/material'
+import { Box, Input, Paper, styled, Typography } from '@mui/material'
 import React, { useState, useCallback } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { useStore } from 'hooks/useStore'
 
-const Root = styled(Box)(() => ({
+const Root = styled(Paper)(() => ({
   height: 400,
   width: '100%',
-  backgroundColor: 'gray',
+  padding: 0,
   display: 'grid',
   placeItems: 'center',
 }))
@@ -30,7 +30,7 @@ export const DropItem = () => {
   const [isError, setIsError] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
 
-  const { pee, setPee } = useStore()
+  const { classYear, setClassYear } = useStore()
 
   const handleOnChange = (e: React.FormEvent<HTMLInputElement>): void => {
     const input = e.currentTarget
