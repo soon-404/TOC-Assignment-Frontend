@@ -34,7 +34,7 @@ export const StoreProvider: FC<StoreProviderProps> = ({ children }) => {
   const [allCourseErrorMsg, setAllCourseErrorMsg] = useState<string | false>(false)
 
   // * Enable this to log `allCourses`
-  useEffect(() => console.log('all courses', allCourses), [allCourses])
+  // useEffect(() => console.log('all courses', allCourses), [allCourses])
 
   useEffect(() => {
     const fetchTables = async () => {
