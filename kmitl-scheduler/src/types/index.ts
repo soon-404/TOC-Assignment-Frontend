@@ -5,8 +5,8 @@ export type CourseType = 'department' | 'language' | 'human' | 'social' | 'sciMa
 export type Credit = Partial<{ [courseType in CourseType]: number }>
 
 export type DateRange = {
-  start: string
-  end: string
+  start: number
+  end: number
 }
 
 export type Section = {
