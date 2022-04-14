@@ -13,8 +13,10 @@ interface LineInfoProps {
 
 const LineInfo = ({ key, label, values, isCopyable }: LineInfoProps) => {
   return (
-    <Box display="flex" alignItems="center">
-      <Typography variant="body1">{label} :</Typography>
+    <Box display="flex" alignItems="start">
+      <Typography variant="body1" sx={{ whiteSpace: 'nowrap' }}>
+        {label} :
+      </Typography>
       <Typography variant="body2">{typeof values === 'string' ? values : values?.join?.(', ')}</Typography>
       {isCopyable && (
         <IconButton
@@ -100,9 +102,39 @@ export const BlockDetailDialog = ({ course }: BlockDetailDialogProps) => {
   return (
     <Box>
       {/* head */}
-      <Typography variant="h6">{course.name}</Typography>
+      <Box display="flex" justifyContent="center" alignItems="center" sx={{ marginBottom: '1rem' }}>
+        <Typography id="courseNameAndId" variant="h6">
+          {course.name} ({course.id})
+        </Typography>
+        <IconButton
+          onClick={() => {
+            let el = document.getElementById('courseNameAndId')
+            if (el != null) {
+              console.log('copy text: ', el.innerHTML)
+              navigator.clipboard.writeText(el.innerHTML)
+            }
+          }}
+        >
+          <ContentCopyIcon fontSize="small" />
+        </IconButton>
+      </Box>
+
+      <Box display="flex" justifyContent="space-between" sx={{ marginBlockEnd: '1rem' }}>
+        <Typography variant="body1" sx={{ whiteSpace: 'nowrap' }}>
+          ชั้นปีการศึกษา :{course.class_year}
+        </Typography>
+        <Typography variant="body1" sx={{ whiteSpace: 'nowrap' }}>
+          หมวดวิชา :{course.course_type}
+        </Typography>
+        <Typography variant="body1" sx={{ whiteSpace: 'nowrap' }}>
+          หน่วยกิต :{course.credit}
+        </Typography>
+      </Box>
       {/* Table */}
       {/* use data in course.section */}
+
+      <Typography variant="h1">table</Typography>
+
       {/* footer */}
       {/* caution bug at onClick */}
       {/* {Object.keys(filteredCourseKey).map((key: string) => (
@@ -127,7 +159,7 @@ export const BlockDetailDialog = ({ course }: BlockDetailDialogProps) => {
         variant={isSelected(course.id) ? 'outlined' : 'contained'}
         startIcon={isSelected(course.id) ? <AutoDeleteIcon /> : <AlarmAddIcon />}
         onClick={editSchedule}
-        sx={{ float: 'right', marginTop: 2 }}
+        sx={{ float: 'right', marginTop: '2rem' }}
       >
         {isSelected(course.id) ? 'remove from schedule' : 'add to schedule'}
       </Button>
