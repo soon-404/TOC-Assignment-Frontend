@@ -4,6 +4,8 @@ import { Course, DateRange } from 'types'
 import { useStore } from 'hooks/useStore'
 import AlarmAddIcon from '@mui/icons-material/AlarmAdd'
 import AutoDeleteIcon from '@mui/icons-material/AutoDelete'
+import CustomizedTables from 'components/CustomizedTables'
+
 interface LineInfoProps {
   key: string
   label: string
@@ -132,8 +134,9 @@ export const BlockDetailDialog = ({ course }: BlockDetailDialogProps) => {
       </Box>
       {/* Table */}
       {/* use data in course.section */}
-
-      <Typography variant="h1">table</Typography>
+      
+      <CustomizedTables content={course.section} />
+      
 
       {/* footer */}
       {/* caution bug at onClick */}
