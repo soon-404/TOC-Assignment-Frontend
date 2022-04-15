@@ -1,4 +1,4 @@
-import { useState, useCallback,useEffect } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { saveAs } from 'file-saver'
 import { Box, Stack, styled, Button, Typography } from '@mui/material'
 import { display, positions } from '@mui/system'
@@ -190,6 +190,17 @@ export const Conclude = () => {
           ดาวน์โหลด
         </Button>
       </Box>
+      <Typography variant="h4" color="white">
+        จำนวนหน่วยกิตที่เหลือ
+      </Typography>
+      <Stack spacing={1} sx={{ color: 'white', marginLeft: '20px' }}>
+        <Typography> 1. วิชาเฉพาะภาควิชา 9 หน่วยกิต</Typography>
+        <Typography> 2. วิชาเลือกหมวดวิทยาศาสตร์กับคณิตศาสตร์ 9 หน่วยกิต</Typography>
+        <Typography> 3. วิชาเลือกหมวดภาษา 9 หน่วยกิต</Typography>
+        <Typography> 4. วิชาเลือกหมวดมนุษยศาสตร์ 9 หน่วยกิต</Typography>
+        <Typography> 5.วิชาเลือกหมวดสังคมศาสตร์ 9 หน่วยกิต</Typography>
+        <Typography> 6. วิชาเลือกเสรี 9 หน่วยกิต</Typography>
+      </Stack>
 
       {/* modal popup confirm download or cancel */}
       {isModalOpen && (
