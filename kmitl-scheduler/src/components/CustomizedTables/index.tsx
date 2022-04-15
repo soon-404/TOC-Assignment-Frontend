@@ -1,8 +1,8 @@
 import { Typography } from '@mui/material'
-import { Section } from 'types'
+import { Section, DateRange } from 'types'
 
 // ******* table *******
-import { useState, VoidFunctionComponent } from 'react'
+import { useEffect, useState, VoidFunctionComponent } from 'react'
 import { styled } from '@mui/material/styles'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
@@ -16,6 +16,48 @@ import { Build } from '@mui/icons-material'
 import Button from '@mui/material/Button'
 import ButtonGroup from '@mui/material/ButtonGroup'
 import Box from '@mui/material/Box'
+
+// ******* Button variants *******
+const VariantButtonGroup = ({
+  section,
+  selectedSection,
+  handleClick,
+}: {
+  section: Section[]
+  selectedSection?: Section
+  handleClick: (section: Section) => void
+}): any => {
+  console.log(section)
+  return (
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        '& > *': {
+          m: 1,
+        },
+        width: '40%',
+        justifyContent: 'space-between',
+      }}
+    >
+      <Typography sx={{ fontWeight: 'bold' }}>{section && section[0].type ? section[0].type : 'ทฤษฎี'}</Typography>
+      <ButtonGroup variant="outlined" aria-label="outlined button group">
+        {section.map((element: Section) => (
+          <Button
+            variant={selectedSection ? (selectedSection.id == element.id ? 'contained' : 'outlined') : 'outlined'}
+            key={element.id}
+            onClick={() => {
+              handleClick(element)
+            }}
+          >
+            {element.id}
+          </Button>
+        ))}
+      </ButtonGroup>
+    </Box>
+  )
+}
 
 // ******* table *******
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -35,36 +77,61 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }))
 
-function createData(detail: string) {
-  return { detail }
+const CalculateDate = (values: DateRange) => {
+  const weekday = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์']
+  let time = ''
+  let date = new Date(values.start * 1000)
+  time += weekday[date.getDay()] + ' ' + date.getHours() + ':' + date.getMinutes() + ' น.'
+  date = new Date(values.end * 1000)
+  time += ' - ' + weekday[date.getDay()] + ' ' + date.getHours() + ':' + date.getMinutes() + ' น.'
+  return time
 }
 
-// ******* Button variants *******
-const VariantButtonGroup = ({ section, type,handleClick }: { section: Section[]; type: string ;handleClick: (section: Section,type:string)=>void}): any => {
-  
+interface SectionTablesProp {
+  content: Section[]
+  selectedSection?: Section
+  handleClick: (section: Section) => void
+}
+
+function SectionTables({ content, selectedSection, handleClick }: SectionTablesProp) {
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        '& > *': {
-          m: 1,
-        },
-      }}
-    >
-      <ButtonGroup variant="outlined" aria-label="outlined button group">
-        {section.map((element: Section) => (
-          <Button
-            key={element.id}
-            onClick={() => {
-              handleClick(element,"P")
-            }}
-          >
-            {element.id}
-          </Button>
-        ))}
-      </ButtonGroup>
+    <Box>
+      <Box display="flex" gap="2rem" justifyContent="center" sx={{ marginBlockEnd: '1rem' }}>
+        <VariantButtonGroup section={content} selectedSection={selectedSection} handleClick={handleClick} />
+      </Box>
+
+      <Box display="flex" justifyContent="center" alignItems="center" sx={{ marginBottom: '1rem' }}>
+        <TableContainer component={Paper} sx={{ backgroundColor: 'white' }}>
+          <Table sx={{ minWidth: 200 }} aria-label="customized table">
+            <TableHead>
+              <TableRow>
+                <StyledTableCell align="center">
+                  {selectedSection?.type || 'ทฤษฎี'} ({selectedSection?.id || 'ไม่ระบุ'})
+                </StyledTableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              <StyledTableRow>
+                <StyledTableCell align="center">
+                  {selectedSection ? CalculateDate(selectedSection?.schedule[0]) : 'ไม่ระบุ'}
+                </StyledTableCell>
+                <StyledTableCell align="center">
+                  {selectedSection?.schedule ? selectedSection.schedule.length : selectedSection}
+                </StyledTableCell>
+              </StyledTableRow>
+              <StyledTableRow>
+                <StyledTableCell align="center">
+                  {selectedSection?.room
+                    ? selectedSection.room
+                    : selectedSection?.building
+                    ? selectedSection.building
+                    : 'ไม่ระบุ'}
+                </StyledTableCell>
+              </StyledTableRow>
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Box>
     </Box>
   )
 }
@@ -75,54 +142,18 @@ export default function CustomizedTables({ content }: SectionTablesProp) {
   const [valuePractice, setValuePractice] = useState<Section>()
 
   const theoryCourse = content.filter((element: Section) => element.type === 'ทฤษฎี')
+  const practiceCourse = content.filter((element: Section) => element.type === 'ปฏิบัติ')
 
-  const handleClick = (section: Section,type:string) => {
-    if (type === 'P') setValuePractice(section)
-    else setValueTheory(section)
+  const handleClick = (section: Section) => {
+    if (section.type === 'ทฤษฎี') setValueTheory(section)
+    else setValuePractice(section)
+    console.log('now section is: ', section.type, section)
   }
 
-  return <SectionTables content={theoryCourse} handleClick={handleClick} />
-}
+  useEffect(() => {
+    setValuePractice(practiceCourse[0])
+    setValueTheory(theoryCourse[0])
+  }, [])
 
-interface SectionTablesProp {
-  content: Section[]
-  handleClick: (section: Section,type:string)=>void
-}
-
-function SectionTables({ content,handleClick }: SectionTablesProp) {
-  const rows = [createData('Frozen yoghurt'), createData('Test data')]
-
-  return (
-    <Box>
-      <Box display="flex" gap="2rem" justifyContent="center" sx={{ marginBlockEnd: '1rem' }}>
-        <Box display="flex" alignItems="center">
-          <p>ปฎิบัติ</p>
-        </Box>
-        <Box>
-          <VariantButtonGroup section={content} type="T" handleClick={handleClick}/>
-        </Box>
-      </Box>
-
-      <Box display="flex" justifyContent="center" alignItems="center" sx={{ marginBottom: '1rem' }}>
-        <TableContainer component={Paper} sx={{ backgroundColor: 'white' }}>
-          <Table sx={{ minWidth: 200 }} aria-label="customized table">
-            <TableHead>
-              <TableRow>
-                <StyledTableCell align="center">
-                  {content[0].type} ({content[0].id})
-                </StyledTableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {rows.map((row) => (
-                <StyledTableRow key={row.detail}>
-                  <StyledTableCell align="center">{row.detail}</StyledTableCell>
-                </StyledTableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Box>
-    </Box>
-  )
+  return <SectionTables content={theoryCourse} handleClick={handleClick} selectedSection={valueTheory} />
 }

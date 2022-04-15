@@ -100,6 +100,7 @@ export const BlockDetailDialog = ({ course }: BlockDetailDialogProps) => {
       setSelectedCourses((prev) => [...prev, course])
     }
   }
+  console.log('course', course)
 
   return (
     <Box>
@@ -134,9 +135,8 @@ export const BlockDetailDialog = ({ course }: BlockDetailDialogProps) => {
       </Box>
       {/* Table */}
       {/* use data in course.section */}
-      
+
       <CustomizedTables content={course.section} />
-      
 
       {/* footer */}
       {/* caution bug at onClick */}
@@ -169,3 +169,7 @@ export const BlockDetailDialog = ({ course }: BlockDetailDialogProps) => {
     </Box>
   )
 }
+
+//  ------------------- note -------------
+// 1.กรณีเวลาเรียนแบ่งเป็น 2 ช่วง cheack length => 20:40
+// 2.section หายใน VariantButtonGroup
