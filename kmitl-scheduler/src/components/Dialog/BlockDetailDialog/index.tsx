@@ -51,20 +51,23 @@ const DateInfo = ({ type, values }: DateInfoProps) => {
     midterm: 'วันสอบกลางภาค',
     final: 'วันสอบปลายภาค',
   }
+  const months_th = [ "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม", ];
+const months_th_mini = [ "ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค.", ];
   // console.log(type, values)
   return (
     <Box display="flex" alignItems="center">
-      <Typography variant="body1">{label[type as keyof typeof label]} :</Typography>
+      <Typography variant="body1">{label[type as keyof typeof label]} : </Typography>
       <Typography variant="body2">
         {typeof values === 'string'
           ? values
-          : new Date(values.start * 1000).getHours() +
+          : new Date(values.start * 1000).getDate()+' ' + months_th[new Date(values.start * 1000).getMonth()] +
+            ' ' + new Date(values.start * 1000).getHours() +
             ':' +
             new Date(values.start * 1000).getMinutes() +
             ' - ' +
             new Date(values.end * 1000).getHours() +
             ':' +
-            new Date(values.end * 1000).getMinutes()}
+            new Date(values.end * 1000).getMinutes()+' น.'}
       </Typography>
     </Box>
   )
@@ -98,10 +101,11 @@ export const BlockDetailDialog = ({ course }: BlockDetailDialogProps) => {
     if(selectedCourse)
     {
       if (isSelected(selectedCourse.id)) {
-        console.log(selectedCourse)
+        // คือ ใช้ temp จริงเวลาแก้ก็แก้ temp แต่เสร็จแล้วเอาขึ้น context ตัวใน context จะมี section ไม่ครบพอเอากลับคืนที่ section ก็จะมีแค่ที่เคยเลือก
+        console.log("go back to free",course)
         const leftedBlocks = selectedCourses.filter((selectedCourse) => selectedCourse.id !== selectedCourse.id)
         setSelectedCourses([...leftedBlocks])
-        setFreeCourses((prev) => [...prev, selectedCourse])
+        setFreeCourses((prev) => [...prev, course])
       } else {
         const leftedBlocks = freeCourses.filter((freeCourse) => freeCourse.id !== selectedCourse.id)
         setFreeCourses([...leftedBlocks])
@@ -113,6 +117,7 @@ export const BlockDetailDialog = ({ course }: BlockDetailDialogProps) => {
   function selectedSection(selectedSection:Section[]){
     console.log("Section",selectedSection)
     let tempCourse:Course = { ...course}
+    selectedSection = selectedSection.filter(x => x !== undefined);
     tempCourse.section = selectedSection
     setSelectedCourse(tempCourse);
   }
