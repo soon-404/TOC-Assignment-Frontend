@@ -27,11 +27,11 @@
 ## installation
 
 ```
-npm install
+yarn install
 ```
 
-## production
+## run project
 
 ```
-npm start
+yarn dev
 ```
