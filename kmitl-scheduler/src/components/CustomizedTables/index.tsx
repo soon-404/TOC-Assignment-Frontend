@@ -27,7 +27,8 @@ const VariantButtonGroup = ({
   selectedSection?: Section
   handleClick: (section: Section) => void
 }): any => {
-  console.log(section)
+  console.log('In VariantButtonGroup section is =>', section)
+  console.log('In VariantButtonGroup select is =>', selectedSection)
   return (
     <Box
       sx={{
@@ -41,17 +42,17 @@ const VariantButtonGroup = ({
         justifyContent: 'space-between',
       }}
     >
-      <Typography sx={{ fontWeight: 'bold' }}>{section && section[0].type ? section[0].type : 'ทฤษฎี'}</Typography>
+      <Typography sx={{ fontWeight: 'bold' }}>{section && section[0]?.type ? section[0]?.type : 'ทฤษฎี'}</Typography>
       <ButtonGroup variant="outlined" aria-label="outlined button group">
         {section.map((element: Section) => (
           <Button
             variant={selectedSection ? (selectedSection.id == element.id ? 'contained' : 'outlined') : 'outlined'}
             key={element.id}
             onClick={() => {
-              handleClick(element)
+              if (element.schedule.length) handleClick(element)
             }}
           >
-            {element.id}
+            {element.id === '' ? 'ไม่ระบุ' : element.id}
           </Button>
         ))}
       </ButtonGroup>
@@ -77,13 +78,29 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }))
 
-const CalculateDate = (values: DateRange) => {
+const CalculateDate = (values: DateRange[]) => {
   const weekday = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์']
   let time = ''
-  let date = new Date(values.start * 1000)
-  time += weekday[date.getDay()] + ' ' + date.getHours() + ':' + date.getMinutes() + ' น.'
-  date = new Date(values.end * 1000)
-  time += ' - ' + weekday[date.getDay()] + ' ' + date.getHours() + ':' + date.getMinutes() + ' น.'
+  if(values[0].start === 0)     time='ไม่ระบุ'
+  else
+  {
+    
+    const Sdate = new Date(values[0].start * 1000)
+    time += weekday[Sdate.getDay()]+' ' + Sdate.getHours() + ':' + Sdate.getMinutes()  
+ 
+    const Edate = new Date(values[0].end * 1000)
+    time += ' - ' + Edate.getHours() + ':' + Edate.getMinutes() + ' น.'
+  
+    if(values.length>20)
+    { 
+      const SsecondDate = new Date(values[21].start * 1000)
+      time += weekday[SsecondDate.getDay()]+ ' ' + SsecondDate.getHours() + ':' + SsecondDate.getMinutes()
+    
+      const EsecondDate = new Date(values[21].end * 1000)
+      time += ' - ' + EsecondDate.getHours() + ':' + EsecondDate.getMinutes() + ' น.'
+    }
+  }
+
   return time
 }
 
@@ -99,7 +116,6 @@ function SectionTables({ content, selectedSection, handleClick }: SectionTablesP
       <Box display="flex" gap="2rem" justifyContent="center" sx={{ marginBlockEnd: '1rem' }}>
         <VariantButtonGroup section={content} selectedSection={selectedSection} handleClick={handleClick} />
       </Box>
-
       <Box display="flex" justifyContent="center" alignItems="center" sx={{ marginBottom: '1rem' }}>
         <TableContainer component={Paper} sx={{ backgroundColor: 'white' }}>
           <Table sx={{ minWidth: 200 }} aria-label="customized table">
@@ -113,11 +129,11 @@ function SectionTables({ content, selectedSection, handleClick }: SectionTablesP
             <TableBody>
               <StyledTableRow>
                 <StyledTableCell align="center">
-                  {selectedSection ? CalculateDate(selectedSection?.schedule[0]) : 'ไม่ระบุ'}
+                {selectedSection?.schedule? CalculateDate(selectedSection?.schedule): CalculateDate([{ start: 0, end: 0 }]) }
                 </StyledTableCell>
-                <StyledTableCell align="center">
+                {/* <StyledTableCell align="center">
                   {selectedSection?.schedule ? selectedSection.schedule.length : selectedSection}
-                </StyledTableCell>
+                </StyledTableCell> */}
               </StyledTableRow>
               <StyledTableRow>
                 <StyledTableCell align="center">
@@ -137,23 +153,60 @@ function SectionTables({ content, selectedSection, handleClick }: SectionTablesP
 }
 
 // ******* main *******
-export default function CustomizedTables({ content }: SectionTablesProp) {
+export default function CustomizedTables({ content }: { content: Section[] }) {
   const [valueTheory, setValueTheory] = useState<Section>()
   const [valuePractice, setValuePractice] = useState<Section>()
+  console.log('--------------------------------------------------')
+  console.log('content in CustomizedTables  =  ', content)
+
+  const tempSection: Section = {
+    id: '',
+    building: '',
+    room: '',
+    schedule: [{ start: 0, end: 0 }],
+    type: '',
+  }
 
   const theoryCourse = content.filter((element: Section) => element.type === 'ทฤษฎี')
   const practiceCourse = content.filter((element: Section) => element.type === 'ปฏิบัติ')
+  console.log('theoryCourse in CustomizedTables  =  ', theoryCourse)
+  console.log('practiceCourse in CustomizedTables  =  ', practiceCourse)
 
   const handleClick = (section: Section) => {
-    if (section.type === 'ทฤษฎี') setValueTheory(section)
+    if (section?.type === 'ทฤษฎี') setValueTheory(section)
     else setValuePractice(section)
-    console.log('now section is: ', section.type, section)
   }
 
   useEffect(() => {
     setValuePractice(practiceCourse[0])
     setValueTheory(theoryCourse[0])
+    console.log('valueTheory', valueTheory)
+    console.log('valuePractice', valuePractice)
+    console.log('set up finish')
   }, [])
 
-  return <SectionTables content={theoryCourse} handleClick={handleClick} selectedSection={valueTheory} />
+  if (practiceCourse.length) {
+    return (
+      <div>
+        <SectionTables
+          content={theoryCourse}
+          handleClick={handleClick}
+          selectedSection={valueTheory ? valueTheory : tempSection}
+        />
+        <SectionTables
+          content={practiceCourse}
+          handleClick={handleClick}
+          selectedSection={valuePractice ? valuePractice : tempSection}
+        />
+      </div>
+    )
+  } else {
+    return (
+      <SectionTables
+        content={theoryCourse}
+        handleClick={handleClick}
+        selectedSection={valueTheory ? valueTheory : tempSection}
+      />
+    )
+  }
 }

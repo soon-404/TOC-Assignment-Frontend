@@ -172,4 +172,6 @@ export const BlockDetailDialog = ({ course }: BlockDetailDialogProps) => {
 
 //  ------------------- note -------------
 // 1.กรณีเวลาเรียนแบ่งเป็น 2 ช่วง cheack length => 20:40
+
+
 // 2.section หายใน VariantButtonGroup
