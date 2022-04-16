@@ -1,19 +1,20 @@
+import { useState } from 'react'
 import { Box, Button, IconButton, Typography } from '@mui/material'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
-import { Course, DateRange } from 'types'
+import { Course, DateRange ,Section} from 'types'
 import { useStore } from 'hooks/useStore'
 import AlarmAddIcon from '@mui/icons-material/AlarmAdd'
 import AutoDeleteIcon from '@mui/icons-material/AutoDelete'
 import CustomizedTables from 'components/CustomizedTables'
 
 interface LineInfoProps {
-  key: string
+  id: string
   label: string
   values?: string[] | string
   isCopyable?: boolean
 }
 
-const LineInfo = ({ key, label, values, isCopyable }: LineInfoProps) => {
+const LineInfo = ({ id, label, values, isCopyable }: LineInfoProps) => {
   return (
     <Box display="flex" alignItems="start">
       <Typography variant="body1" sx={{ whiteSpace: 'nowrap' }}>
@@ -23,7 +24,7 @@ const LineInfo = ({ key, label, values, isCopyable }: LineInfoProps) => {
       {isCopyable && (
         <IconButton
           onClick={() => {
-            let el = document.getElementById(key)
+            let el = document.getElementById(id)
             if (el != null) {
               // set copy logic
             }
@@ -69,6 +70,9 @@ const DateInfo = ({ type, values }: DateInfoProps) => {
   )
 }
 
+
+
+
 type BlockDetailPickOut = Omit<Course, 'midterm' | 'final' | 'section'>
 type KeyOfBlockDetailPickOut = keyof BlockDetailPickOut
 type CopyableKey = Extract<KeyOfBlockDetailPickOut, 'id' | 'name'>
@@ -79,9 +83,10 @@ interface BlockDetailDialogProps {
 
 const CopyableKey: string[] = ['id', 'name'] as CopyableKey[]
 
+
 export const BlockDetailDialog = ({ course }: BlockDetailDialogProps) => {
   const { freeCourses, setFreeCourses, selectedCourses, setSelectedCourses } = useStore()
-
+  const [selectedCourse,setSelectedCourse]  = useState<Course>()
   const filteredCourseKey: BlockDetailPickOut = course
 
   const isSelected = (courseId: string) => {
@@ -90,20 +95,38 @@ export const BlockDetailDialog = ({ course }: BlockDetailDialogProps) => {
   }
 
   function editSchedule() {
-    if (isSelected(course.id)) {
-      const leftedBlocks = selectedCourses.filter((selectedCourse) => selectedCourse.id !== course.id)
-      setSelectedCourses([...leftedBlocks])
-      setFreeCourses((prev) => [...prev, course])
-    } else {
-      const leftedBlocks = freeCourses.filter((freeCourse) => freeCourse.id !== course.id)
-      setFreeCourses([...leftedBlocks])
-      setSelectedCourses((prev) => [...prev, course])
+    if(selectedCourse)
+    {
+      if (isSelected(selectedCourse.id)) {
+        console.log(selectedCourse)
+        const leftedBlocks = selectedCourses.filter((selectedCourse) => selectedCourse.id !== selectedCourse.id)
+        setSelectedCourses([...leftedBlocks])
+        setFreeCourses((prev) => [...prev, selectedCourse])
+      } else {
+        const leftedBlocks = freeCourses.filter((freeCourse) => freeCourse.id !== selectedCourse.id)
+        setFreeCourses([...leftedBlocks])
+        setSelectedCourses((prev) => [...prev, selectedCourse])
+      }
     }
   }
+
+  function selectedSection(selectedSection:Section[]){
+    console.log("Section",selectedSection)
+    let tempCourse:Course = { ...course}
+    tempCourse.section = selectedSection
+    setSelectedCourse(tempCourse);
+  }
+
+  const selectedSectionID=()=>{
+    let temp:string[] = []
+    selectedCourse?.section.map((s)=> temp.push(s.id))
+    return temp
+  }
+
   console.log('course', course)
 
   return (
-    <Box>
+    <Box >
       {/* head */}
       <Box display="flex" justifyContent="center" alignItems="center" sx={{ marginBottom: '1rem' }}>
         <Typography id="courseNameAndId" variant="h6">
@@ -133,23 +156,14 @@ export const BlockDetailDialog = ({ course }: BlockDetailDialogProps) => {
           หน่วยกิต :{course.credit}
         </Typography>
       </Box>
-      {/* Table */}
-      {/* use data in course.section */}
 
-      <CustomizedTables content={course.section} />
+
+      {/* Table */}
+        <CustomizedTables content={course.section} setSec={selectedSection} />
 
       {/* footer */}
-      {/* caution bug at onClick */}
-      {/* {Object.keys(filteredCourseKey).map((key: string) => (
-        <LineInfo
-          key={key}
-          label={key}
-          values={filteredCourseKey[key as KeyOfBlockDetailPickOut]}
-          isCopyable={CopyableKey.includes(key)}
-        />
-      ))} */}
       <LineInfo
-        key={'teacher'}
+        id={'teacher'}
         label={'อาจารย์ผู้สอน'}
         values={filteredCourseKey['teacher'].length ? filteredCourseKey['teacher'] : ['ยังไม่ประกาศ']}
         isCopyable={false}
@@ -171,7 +185,6 @@ export const BlockDetailDialog = ({ course }: BlockDetailDialogProps) => {
 }
 
 //  ------------------- note -------------
-// 1.กรณีเวลาเรียนแบ่งเป็น 2 ช่วง cheack length => 20:40
-
-
-// 2.section หายใน VariantButtonGroup
+// 1.กด add ซ้ำๆแล้ว course หาย
+// 3. ลากคืน แล้ว sec หาย
+// 4. กด remove แล้ว selected course in context หายหมด
