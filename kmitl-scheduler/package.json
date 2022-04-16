@@ -1,39 +1,40 @@
 {
-  "name": "kmitl-scheduler",
-  "private": true,
-  "version": "0.0.0",
-  "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview",
-    "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\""
-  },
-  "dependencies": {
-    "@emotion/react": "^11.8.2",
-    "@emotion/styled": "^11.8.1",
-    "@mobiscroll/react": "https://npm.mobiscroll.com/@mobiscroll/react-trial/-/react-trial-5.15.2.tgz",
-    "@mui/icons-material": "^5.5.1",
-    "@mui/material": "^5.5.1",
-    "axios": "^0.26.1",
-    "axios-retry": "^3.2.4",
-    "file-saver": "^2.0.5",
-    "framer-motion": "^6.2.8",
-    "html-to-image": "^1.9.0",
-    "jszip": "^3.9.1",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "react-dropzone": "^12.0.4",
-    "react-router-dom": "6"
-  },
-  "devDependencies": {
-    "@emotion/babel-plugin": "^11.7.2",
-    "@types/file-saver": "^2.0.5",
-    "@types/react": "^17.0.33",
-    "@types/react-dom": "^17.0.10",
-    "@vitejs/plugin-react": "^1.0.7",
-    "prettier": "^2.6.0",
-    "typescript": "^4.5.4",
-    "vite": "^2.8.0",
-    "vite-tsconfig-paths": "^3.4.1"
-  }
+    "name": "kmitl-scheduler",
+    "private": true,
+    "version": "0.0.0",
+    "scripts": {
+        "dev": "vite",
+        "build": "tsc && vite build",
+        "preview": "vite preview",
+        "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\""
+    },
+    "dependencies": {
+        "@emotion/react": "^11.8.2",
+        "@emotion/styled": "^11.8.1",
+        "@mobiscroll/react": "https://npm.mobiscroll.com/@mobiscroll/react-trial/-/react-trial-5.16.0.tgz",
+        "@mui/icons-material": "^5.5.1",
+        "@mui/material": "^5.5.1",
+        "@mui/styles": "^5.6.1",
+        "axios": "^0.26.1",
+        "axios-retry": "^3.2.4",
+        "file-saver": "^2.0.5",
+        "framer-motion": "^6.2.8",
+        "html-to-image": "^1.9.0",
+        "jszip": "^3.9.1",
+        "react": "^17.0.2",
+        "react-dom": "^17.0.2",
+        "react-dropzone": "^12.0.4",
+        "react-router-dom": "6"
+    },
+    "devDependencies": {
+        "@emotion/babel-plugin": "^11.7.2",
+        "@types/file-saver": "^2.0.5",
+        "@types/react": "^17.0.33",
+        "@types/react-dom": "^17.0.10",
+        "@vitejs/plugin-react": "^1.0.7",
+        "prettier": "^2.6.0",
+        "typescript": "^4.5.4",
+        "vite": "^2.8.0",
+        "vite-tsconfig-paths": "^3.4.1"
+    }
 }

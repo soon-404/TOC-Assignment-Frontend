@@ -8,6 +8,7 @@ import { DropZone } from 'components/Dropzone'
 import { useStore } from 'hooks/useStore'
 
 import { DomRect } from 'types'
+import SearchBar from 'components/SearchBar'
 
 export const MajorSchedule = () => {
   const { freeCourses, selectedCourses } = useStore()
@@ -18,6 +19,7 @@ export const MajorSchedule = () => {
 
   return (
     <Stack gap={2}>
+      <SearchBar />
       <DragZone color="#f107a3" courses={freeCourses} dropZonesDomRects={dropZonesDomRects} />
       <DropZone
         color="#7b2ff7"

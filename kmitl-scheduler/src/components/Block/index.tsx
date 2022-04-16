@@ -23,7 +23,7 @@ const BlockClone = styled(StyledBlock)(() => ({
   left: 0,
   right: 0,
   bottom: 0,
-  zIndex: 696969,
+  zIndex: 1,
 }))
 
 type FramerEventType = MouseEvent | TouchEvent | PointerEvent

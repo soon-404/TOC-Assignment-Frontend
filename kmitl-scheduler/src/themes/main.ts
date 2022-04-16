@@ -29,6 +29,9 @@ theme.components = {
         borderRadius: '20px',
         boxShadow: 'unset',
         backgroundColor: theme.palette.background.paper,
+        selected: {
+          backgroundColor: 'white',
+        },
       },
     },
   },
