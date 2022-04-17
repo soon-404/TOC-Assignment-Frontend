@@ -1,7 +1,9 @@
 import { Box, Input, Paper, styled, Typography } from '@mui/material'
+import FormData from 'form-data'
 import React, { useState, useCallback } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { useStore } from 'hooks/useStore'
+import { httpClient } from 'api/httpClient'
 
 const Root = styled(Paper)(() => ({
   height: 400,
@@ -49,6 +51,14 @@ export const DropItem = () => {
       setIsError(true)
       setErrorMsg('Cannot upload image with size more than 15 MB.')
     }
+  }
+
+  const sendTranscript = async () => {
+    const data = new FormData()
+    data.append('file', files[0])
+
+    const { data: res } = await httpClient.post('/uploader', data, { headers: data.getHeaders() })
+    console.log('x', res)
   }
 
   const onDrop = useCallback((acceptedFiles) => {
