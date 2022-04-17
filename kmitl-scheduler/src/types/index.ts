@@ -1,3 +1,5 @@
+import { Moment } from 'moment'
+
 export type ClassYear = '1' | '2' | '3' | '4'
 
 export type CourseType = 'department' | 'language' | 'human' | 'social' | 'sciMath' | 'free'
@@ -62,4 +64,11 @@ export interface DomRect {
   left: number
   right: number
   bottom: number
+}
+
+export type EventToCalendar = {
+  title?: string
+  start: Moment
+  end: Moment
+  color: string
 }
