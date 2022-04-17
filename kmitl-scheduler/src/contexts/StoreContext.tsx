@@ -24,7 +24,7 @@ export const StoreContext = createContext<IStoreContext>({} as IStoreContext)
 
 export const StoreProvider: FC<StoreProviderProps> = ({ children }) => {
   const [activeStep, setActiveStep] = useState<number>(0)
-  const [classYear, setClassYear] = useState<ClassYear | null>(null) // TODO : set default `null`
+  const [classYear, setClassYear] = useState<ClassYear | null>('2') // TODO : set default `null`
 
   const [allCourses, setAllCourses] = useState<Course[] | undefined>()
   const [freeCourses, setFreeCourses] = useState<Course[]>([])

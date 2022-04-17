@@ -1,22 +1,22 @@
 import { Typography } from '@mui/material'
-import { Section, DateRange } from 'types'
-import { red,cyan,lightBlue } from '@mui/material/colors';
-
-// ******* table *******
 import { useEffect, useState } from 'react'
-import { styled } from '@mui/material/styles'
-import Table from '@mui/material/Table'
-import TableBody from '@mui/material/TableBody'
-import TableCell, { tableCellClasses } from '@mui/material/TableCell'
-import TableContainer from '@mui/material/TableContainer'
-import TableHead from '@mui/material/TableHead'
-import TableRow from '@mui/material/TableRow'
-import Paper from '@mui/material/Paper'
-import { Build } from '@mui/icons-material'
-// ******* Button variants *******
-import Button from '@mui/material/Button'
-import ButtonGroup from '@mui/material/ButtonGroup'
-import Box from '@mui/material/Box'
+import { Section } from 'types'
+import {
+  styled,
+  Table,
+  TableBody,
+  TableCell,
+  tableCellClasses,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Button,
+  ButtonGroup,
+  Box,
+} from '@mui/material'
+import { lightBlue } from '@mui/material/colors'
+
 
 // ******* Button variants *******
 const VariantButtonGroup = ({

@@ -53,12 +53,13 @@ export const DropItem = () => {
     }
   }
 
+  // TODO : use this
   const sendTranscript = async () => {
-    const data = new FormData()
-    data.append('file', files[0])
+    const formData = new FormData()
+    formData.append('file', files[0])
 
-    const { data: res } = await httpClient.post('/uploader', data, { headers: data.getHeaders() })
-    console.log('x', res)
+    const { data } = await httpClient.post('/uploader', formData, { headers: formData.getHeaders() })
+    console.log('x', data)
   }
 
   const onDrop = useCallback((acceptedFiles) => {
