@@ -6,6 +6,7 @@ export type CourseType = 'department' | 'language' | 'human' | 'social' | 'sciMa
 
 export type Credit = Partial<{ [courseType in CourseType]: number }>
 
+
 export type DateRange = {
   start: number
   end: number

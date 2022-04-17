@@ -1,31 +1,80 @@
+import { useState } from 'react'
 import { Box, Button, IconButton, Typography } from '@mui/material'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
-import { Course } from 'types'
+import { Course, DateRange ,Section} from 'types'
 import { useStore } from 'hooks/useStore'
+import AlarmAddIcon from '@mui/icons-material/AlarmAdd'
+import AutoDeleteIcon from '@mui/icons-material/AutoDelete'
+import CustomizedTables from 'components/CustomizedTables'
 
 interface LineInfoProps {
+  id: string
   label: string
   values?: string[] | string
   isCopyable?: boolean
 }
 
-const LineInfo = ({ label, values, isCopyable }: LineInfoProps) => {
+const LineInfo = ({ id, label, values, isCopyable }: LineInfoProps) => {
   return (
-    <Box display="flex" alignItems="center">
-      <Typography variant="body1" color="#ffffff">
+    <Box display="flex" alignItems="start">
+      <Typography variant="body1" sx={{ whiteSpace: 'nowrap' }}>
         {label} :
       </Typography>
-      <Typography variant="body2" color="#ffffff">
-        {typeof values === 'string' ? values : values?.join?.(', ')}
-      </Typography>
+      <Typography variant="body2">{typeof values === 'string' ? values : values?.join?.(', ')}</Typography>
       {isCopyable && (
-        <IconButton>
+        <IconButton
+          onClick={() => {
+            let el = document.getElementById(id)
+            if (el != null) {
+              // set copy logic
+            }
+          }}
+        >
           <ContentCopyIcon />
         </IconButton>
       )}
     </Box>
   )
 }
+
+interface DateInfoProps {
+  type: 'midterm' | 'final'
+  values: string | DateRange
+}
+interface DateInfoLabel {
+  midterm: string
+  final: string
+}
+
+const DateInfo = ({ type, values }: DateInfoProps) => {
+  const label: DateInfoLabel = {
+    midterm: 'วันสอบกลางภาค',
+    final: 'วันสอบปลายภาค',
+  }
+  const months_th = [ "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม", ];
+const months_th_mini = [ "ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค.", ];
+  // console.log(type, values)
+  return (
+    <Box display="flex" alignItems="center">
+      <Typography variant="body1">{label[type as keyof typeof label]} : </Typography>
+      <Typography variant="body2">
+        {typeof values === 'string'
+          ? values
+          : new Date(values.start * 1000).getDate()+' ' + months_th[new Date(values.start * 1000).getMonth()] +
+            ' ' + new Date(values.start * 1000).getHours() +
+            ':' +
+            new Date(values.start * 1000).getMinutes() +
+            ' - ' +
+            new Date(values.end * 1000).getHours() +
+            ':' +
+            new Date(values.end * 1000).getMinutes()+' น.'}
+      </Typography>
+    </Box>
+  )
+}
+
+
+
 
 type BlockDetailPickOut = Omit<Course, 'midterm' | 'final' | 'section'>
 type KeyOfBlockDetailPickOut = keyof BlockDetailPickOut
@@ -37,25 +86,110 @@ interface BlockDetailDialogProps {
 
 const CopyableKey: string[] = ['id', 'name'] as CopyableKey[]
 
-export const BlockDetailDialog = ({ course }: BlockDetailDialogProps) => {
-  const { setSelectedCourses } = useStore()
 
+export const BlockDetailDialog = ({ course }: BlockDetailDialogProps) => {
+  const { freeCourses, setFreeCourses, selectedCourses, setSelectedCourses } = useStore()
+  const [selectedCourse,setSelectedCourse]  = useState<Course>()
   const filteredCourseKey: BlockDetailPickOut = course
 
+  const isSelected = (courseId: string) => {
+    const target = selectedCourses.find((course) => course.id == courseId)
+    return target ? true : false
+  }
+
+  function editSchedule() {
+    if(selectedCourse)
+    {
+      if (isSelected(selectedCourse.id)) {
+        // คือ ใช้ temp จริงเวลาแก้ก็แก้ temp แต่เสร็จแล้วเอาขึ้น context ตัวใน context จะมี section ไม่ครบพอเอากลับคืนที่ section ก็จะมีแค่ที่เคยเลือก
+        console.log("go back to free",course)
+        const leftedBlocks = selectedCourses.filter((selectedCourse) => selectedCourse.id !== selectedCourse.id)
+        setSelectedCourses([...leftedBlocks])
+        setFreeCourses((prev) => [...prev, course])
+      } else {
+        const leftedBlocks = freeCourses.filter((freeCourse) => freeCourse.id !== selectedCourse.id)
+        setFreeCourses([...leftedBlocks])
+        setSelectedCourses((prev) => [...prev, selectedCourse])
+      }
+    }
+  }
+
+  function selectedSection(selectedSection:Section[]){
+    console.log("Section",selectedSection)
+    let tempCourse:Course = { ...course}
+    selectedSection = selectedSection.filter(x => x !== undefined);
+    tempCourse.section = selectedSection
+    setSelectedCourse(tempCourse);
+  }
+
+  const selectedSectionID=()=>{
+    let temp:string[] = []
+    selectedCourse?.section.map((s)=> temp.push(s.id))
+    return temp
+  }
+
+  console.log('course', course)
+
   return (
-    <Box>
-      <Typography variant="h6">คณิตศาสตร์</Typography>
-      {Object.keys(filteredCourseKey).map((key: string) => (
-        <LineInfo
-          key={key}
-          label={key}
-          values={filteredCourseKey[key as KeyOfBlockDetailPickOut]}
-          isCopyable={CopyableKey.includes(key)}
-        />
-      ))}
-      <Button variant="contained" onClick={() => setSelectedCourses((prev) => [...prev, course])}>
-        add to schedule
+    <Box >
+      {/* head */}
+      <Box display="flex" justifyContent="center" alignItems="center" sx={{ marginBottom: '1rem' }}>
+        <Typography id="courseNameAndId" variant="h6">
+          {course.name} ({course.id})
+        </Typography>
+        <IconButton
+          onClick={() => {
+            let el = document.getElementById('courseNameAndId')
+            if (el != null) {
+              console.log('copy text: ', el.innerHTML)
+              navigator.clipboard.writeText(el.innerHTML)
+            }
+          }}
+        >
+          <ContentCopyIcon fontSize="small" />
+        </IconButton>
+      </Box>
+
+      <Box display="flex" justifyContent="space-between" sx={{ marginBlockEnd: '1rem' }}>
+        <Typography variant="body1" sx={{ whiteSpace: 'nowrap' }}>
+          ชั้นปีการศึกษา :{course.class_year}
+        </Typography>
+        <Typography variant="body1" sx={{ whiteSpace: 'nowrap' }}>
+          หมวดวิชา :{course.course_type}
+        </Typography>
+        <Typography variant="body1" sx={{ whiteSpace: 'nowrap' }}>
+          หน่วยกิต :{course.credit}
+        </Typography>
+      </Box>
+
+
+      {/* Table */}
+        <CustomizedTables content={course.section} setSec={selectedSection} />
+
+      {/* footer */}
+      <LineInfo
+        id={'teacher'}
+        label={'อาจารย์ผู้สอน'}
+        values={filteredCourseKey['teacher'].length ? filteredCourseKey['teacher'] : ['ยังไม่ประกาศ']}
+        isCopyable={false}
+      />
+
+      <DateInfo type={'midterm'} values={course.midterm || 'ยังไม่ประกาศ'} />
+      <DateInfo type={'final'} values={course.final || 'ยังไม่ประกาศ'} />
+
+      <Button
+        variant={isSelected(course.id) ? 'outlined' : 'contained'}
+        startIcon={isSelected(course.id) ? <AutoDeleteIcon /> : <AlarmAddIcon />}
+        onClick={editSchedule}
+        sx={{ float: 'right', marginTop: '2rem' }}
+      >
+        {isSelected(course.id) ? 'remove from schedule' : 'add to schedule'}
       </Button>
     </Box>
   )
 }
+
+//  ------------------- note -------------
+// 1.กด add ซ้ำๆแล้ว course หาย
+// 3. ลากคืน แล้ว sec หาย
+// 4. กด remove แล้ว selected course in context หายหมด

@@ -66,13 +66,13 @@ export const StoreProvider: FC<StoreProviderProps> = ({ children }) => {
   }, [activeStep, allCourses])
 
   const _value = {
-    activeStep,
+    activeStep, //  step การทำงานที่กำลัง active อยู่ตอนนี้
     setActiveStep,
     classYear,
     setClassYear,
     freeCourses,
     setFreeCourses,
-    selectedCourses,
+    selectedCourses, // วิชาที่ user เลือก
     setSelectedCourses,
     isAllCourseLoading,
     allCourseErrorMsg,
