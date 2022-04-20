@@ -5,7 +5,7 @@ import { Block } from 'components/Block'
 import { BlockDetailDialog } from 'components/Dialog/BlockDetailDialog'
 import { useDialog, useStore } from 'hooks/useStore'
 import { isCoordsInDropBoundaries } from 'utils/dropzone'
-import { Course, DomRect } from 'types'
+import { CourseWithSection, DomRect } from 'types'
 
 const Root = styled(Paper)(() => ({
   gap: 16,
@@ -28,7 +28,7 @@ const Root = styled(Paper)(() => ({
 
 interface DragZoneProps {
   color: string
-  courses?: Course[]
+  courses?: CourseWithSection[]
   dropZonesDomRects: DomRect | null
 }
 
@@ -36,24 +36,24 @@ export const DragZone = ({ color, courses = [], dropZonesDomRects }: DragZonePro
   const { open } = useDialog()
   const { freeCourses, setFreeCourses, setSelectedCourses } = useStore()
 
-  const handleOnDragEnd = (course: Course, { point }: PanInfo) => {
+  const handleOnDragEnd = (courseWithSection: CourseWithSection, { point }: PanInfo) => {
     if (!dropZonesDomRects) return
     if (isCoordsInDropBoundaries(point, dropZonesDomRects)) {
-      const leftedBlocks = freeCourses.filter((freeCourse) => freeCourse.id !== course.id)
+      const leftedBlocks = freeCourses.filter(({ course }) => course.id !== courseWithSection.course.id)
       setFreeCourses([...leftedBlocks])
-      setSelectedCourses((prev) => [...prev, course])
+      setSelectedCourses((prev) => [...prev, courseWithSection])
     }
   }
 
   return (
     <Root>
-      {courses.map((course) => (
+      {courses.map((courseWithSection, idx) => (
         <Block
-          key={course.id}
+          key={`DragZone-${courseWithSection.course.id}-${idx}`}
           color={color}
-          label={course.name}
-          onDoubleClick={() => open(<BlockDetailDialog course={course} />)}
-          onDragEnd={(_, info) => handleOnDragEnd(course, info)}
+          label={courseWithSection.course.name}
+          onDoubleClick={() => open(<BlockDetailDialog courseWithSection={courseWithSection} from="dragzone" />)}
+          onDragEnd={(_, info) => handleOnDragEnd(courseWithSection, info)}
         />
       ))}
     </Root>

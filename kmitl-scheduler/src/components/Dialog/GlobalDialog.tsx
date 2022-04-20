@@ -25,7 +25,11 @@ export const GlobalDialog = () => {
   if (!dialogContent) return null
 
   return (
-    <DialogMui onClose={close} open={isDialogOpen} PaperProps={{ style: { backgroundColor: 'white', minWidth: '50vw' } }}>
+    <DialogMui
+      onClose={close}
+      open={isDialogOpen}
+      PaperProps={{ style: { backgroundColor: 'white', minWidth: '50vw' } }}
+    >
       <CloseButton onClick={close} />
       <Content>{dialogContent}</Content>
     </DialogMui>

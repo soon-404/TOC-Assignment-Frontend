@@ -1,5 +1,5 @@
 import { createContext, ReactNode, Dispatch, useState, SetStateAction, FC, useEffect } from 'react'
-import { Course, ClassYear, ApiTablesData } from 'types'
+import { Course, CourseWithSection, ClassYear, ApiTablesData, SectionType } from 'types'
 
 import { httpClient } from 'api/httpClient'
 
@@ -8,10 +8,10 @@ interface IStoreContext {
   setActiveStep: Dispatch<SetStateAction<number>>
   classYear: ClassYear | null
   setClassYear: Dispatch<SetStateAction<ClassYear | null>>
-  freeCourses: Course[]
-  setFreeCourses: Dispatch<SetStateAction<Course[]>>
-  selectedCourses: Course[]
-  setSelectedCourses: Dispatch<SetStateAction<Course[]>>
+  freeCourses: CourseWithSection[]
+  setFreeCourses: Dispatch<SetStateAction<CourseWithSection[]>>
+  selectedCourses: CourseWithSection[]
+  setSelectedCourses: Dispatch<SetStateAction<CourseWithSection[]>>
   isAllCourseLoading: boolean
   allCourseErrorMsg: string | false
 }
@@ -27,14 +27,22 @@ export const StoreProvider: FC<StoreProviderProps> = ({ children }) => {
   const [classYear, setClassYear] = useState<ClassYear | null>('2') // TODO : set default `null`
 
   const [allCourses, setAllCourses] = useState<Course[] | undefined>()
-  const [freeCourses, setFreeCourses] = useState<Course[]>([])
-  const [selectedCourses, setSelectedCourses] = useState<Course[]>([])
+  const [freeCourses, setFreeCourses] = useState<CourseWithSection[]>([])
+  const [selectedCourses, setSelectedCourses] = useState<CourseWithSection[]>([])
 
   const [isAllCourseLoading, setIsAllCourseLoading] = useState<boolean>(false)
   const [allCourseErrorMsg, setAllCourseErrorMsg] = useState<string | false>(false)
 
   // * Enable this to log `allCourses`
   // useEffect(() => console.log('all courses', allCourses), [allCourses])
+  // useEffect(
+  //   () =>
+  //     console.log(
+  //       'all courses',
+  //       allCourses?.find((course) => course.name === 'DEVELOPMENT OF READING AND WRITING SKILLS IN ENGLISH'),
+  //     ),
+  //   [allCourses],
+  // )
 
   useEffect(() => {
     const fetchTables = async () => {
@@ -49,7 +57,7 @@ export const StoreProvider: FC<StoreProviderProps> = ({ children }) => {
         return
       }
 
-      setAllCourses(courses)
+      setAllCourses(courses.filter((course) => !!course && !!course?.id && !!course?.section))
       setIsAllCourseLoading(false)
     }
 
@@ -60,7 +68,13 @@ export const StoreProvider: FC<StoreProviderProps> = ({ children }) => {
     if (!allCourses) return
 
     if (activeStep === 1) {
-      const suggestCourses = allCourses.filter((course) => course.class_year === classYear)
+      const suggestCourses: CourseWithSection[] = allCourses
+        .filter((course) => course.class_year === classYear)
+        .map((course) => ({
+          course: course,
+          sectionPractice: course.section.find((section) => section?.type === SectionType.Practice),
+          sectionTheory: course.section.find((section) => section?.type === SectionType.Theory),
+        }))
       setFreeCourses(suggestCourses)
     }
   }, [activeStep, allCourses])

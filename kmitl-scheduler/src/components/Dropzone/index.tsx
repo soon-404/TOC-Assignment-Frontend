@@ -6,7 +6,7 @@ import { useStore, useDialog } from 'hooks/useStore'
 import { Block } from 'components/Block'
 import { BlockDetailDialog } from 'components/Dialog/BlockDetailDialog'
 import { isCoordsInDropBoundaries } from 'utils/dropzone'
-import { Course, DomRect } from 'types'
+import { CourseWithSection, DomRect } from 'types'
 
 const Root = styled(Paper)(() => ({
   gap: 16,
@@ -21,7 +21,7 @@ const Root = styled(Paper)(() => ({
 
 interface IDropZone {
   color: string
-  courses?: Course[]
+  courses?: CourseWithSection[]
   dropZonesDomRects: DomRect | null
   setDropZonesDomRects: (dropZonesDomRects: DomRect) => void
 }
@@ -55,25 +55,27 @@ export const DropZone: React.FC<IDropZone> = ({ color, courses = [], dropZonesDo
     return isCoordsInDropBoundaries(point, dropZonesDomRects)
   }
 
-  const handleOnDragEnd = (course: Course, { point }: PanInfo) => {
+  const handleOnDragEnd = (courseWithSection: CourseWithSection, { point }: PanInfo) => {
     if (!dropZonesDomRects) return
     if (!isCoordsInDropBoundaries(point, dropZonesDomRects)) {
-      const leftedBlocks = selectedCourses.filter((selectedCourse) => selectedCourse.id !== course.id)
+      const leftedBlocks = selectedCourses.filter(
+        (selectedCourse) => selectedCourse.course.id !== courseWithSection.course.id,
+      )
       setSelectedCourses([...leftedBlocks])
-      setFreeCourses((prev) => [...prev, course])
+      setFreeCourses((prev) => [...prev, courseWithSection])
     }
   }
 
   return (
     <Root ref={zoneRef}>
-      {courses.map((course) => (
+      {courses.map((courseWithSection, idx) => (
         <Block
-          key={course.id}
+          key={`DropZone-${courseWithSection.course.id}-${idx}`}
           color={color}
-          label={course.name}
+          label={courseWithSection.course.name}
           isCoordsInBox={isCoordsInBox}
-          onDoubleClick={() => open(<BlockDetailDialog course={course} />)}
-          onDragEnd={(_, info) => handleOnDragEnd(course, info)}
+          onDoubleClick={() => open(<BlockDetailDialog courseWithSection={courseWithSection} from="dropzone" />)}
+          onDragEnd={(_, info) => handleOnDragEnd(courseWithSection, info)}
         />
       ))}
     </Root>

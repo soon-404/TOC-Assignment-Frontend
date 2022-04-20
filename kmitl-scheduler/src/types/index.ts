@@ -2,10 +2,14 @@ import { Moment } from 'moment'
 
 export type ClassYear = '1' | '2' | '3' | '4'
 
+export enum SectionType {
+  Theory = 'ทฤษฎี',
+  Practice = 'ปฏิบัติ',
+}
+
 export type CourseType = 'department' | 'language' | 'human' | 'social' | 'sciMath' | 'free'
 
 export type Credit = Partial<{ [courseType in CourseType]: number }>
-
 
 export type DateRange = {
   start: number
@@ -17,7 +21,7 @@ export type Section = {
   building?: string
   room?: string
   schedule: DateRange[]
-  type: string
+  type?: SectionType
 }
 
 export type Course = {
@@ -72,4 +76,10 @@ export type EventToCalendar = {
   start: Moment
   end: Moment
   color: string
+}
+
+export type CourseWithSection = {
+  course: Course
+  sectionTheory?: Section
+  sectionPractice?: Section
 }

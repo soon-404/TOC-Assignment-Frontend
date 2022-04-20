@@ -1,6 +1,6 @@
-import { useState, useCallback, useEffect, useMemo } from 'react'
+import { useState, useCallback, useMemo } from 'react'
 import { Stack } from '@mui/material'
-import { flattenDeep } from 'lodash'
+import { flattenDeep, compact } from 'lodash'
 import moment from 'moment'
 import { Eventcalendar as EventCalendar, toast, localeTh } from '@mobiscroll/react'
 
@@ -19,20 +19,30 @@ export const MajorSchedule = () => {
 
   const onEventClick = useCallback((event) => toast({ message: event.event.title }), [])
 
-  const allSchedule = useMemo(() => {
-    return flattenDeep(
-      selectedCourses
-        .filter(({ section }) => !!section.length)
-        .map<Array<EventToCalendar>>((course) =>
-          course.section[0].schedule.map(({ start, end }) => ({
-            title: course.name,
-            start: moment.unix(start),
-            end: moment.unix(end),
-            color: '#f107a3',
-          })),
-        ),
-    )
-  }, [selectedCourses])
+  const allSchedule = useMemo(
+    () =>
+      flattenDeep(
+        selectedCourses
+          .filter(({ course }) => !!course.section.length)
+          .map(({ course, sectionPractice, sectionTheory }) =>
+            compact([
+              sectionPractice?.schedule.map<EventToCalendar>(({ start, end }) => ({
+                title: course.name,
+                start: moment.unix(start),
+                end: moment.unix(end),
+                color: '#f107a3',
+              })) ?? null,
+              sectionTheory?.schedule.map<EventToCalendar>(({ start, end }) => ({
+                title: course.name,
+                start: moment.unix(start),
+                end: moment.unix(end),
+                color: '#f107a3',
+              })) ?? null,
+            ]),
+          ),
+      ),
+    [selectedCourses],
+  )
 
   // * Enable this to log `allSchedule`
   // useEffect(() => console.log('allSchedule', allSchedule), [allSchedule])

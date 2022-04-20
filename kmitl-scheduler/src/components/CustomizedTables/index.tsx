@@ -1,6 +1,5 @@
-import { Typography } from '@mui/material'
-import { useEffect, useState } from 'react'
-import { Section } from 'types'
+import { useCallback, useMemo, useState } from 'react'
+import { Course, Section, SectionType } from 'types'
 import {
   styled,
   Table,
@@ -14,52 +13,22 @@ import {
   Button,
   ButtonGroup,
   Box,
+  Typography,
 } from '@mui/material'
 import { lightBlue } from '@mui/material/colors'
+import { CalculateDate } from 'utils/calculateDate'
+import { CourseWithSection } from 'types'
 
-
-// ******* Button variants *******
-const VariantButtonGroup = ({
-  section,
-  selectedSection,
-  handleClick,
-}: {
-  section: Section[]
-  selectedSection?: Section
-  handleClick: (section: Section) => void
-}): any => {
-
-  return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent:"center",
-        alignItems: 'center',
-        '& > *': {
-          m: 1,
-        },
-        width: '40%',
-        
-         }}
-    >
-      <Typography sx={{ fontWeight: 'bold' }}>{section && section[0]?.type ? section[0]?.type : 'ทฤษฎี'}</Typography>
-      <ButtonGroup variant="outlined" aria-label="outlined button group">
-        {section.map((element: Section) => (
-          <Button
-            variant={selectedSection ? (selectedSection.id == element.id ? 'contained' : 'outlined') : 'outlined'}
-            key={element.id}
-            onClick={() => {
-              handleClick(element)
-            }}
-          >
-            {element.id === '' ? 'ไม่ระบุ' : element.id}
-          </Button>
-        ))}
-      </ButtonGroup>
-    </Box>
-  )
-}
+const RootVariantButtonGroup = styled(Box)(() => ({
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'center',
+  alignItems: 'center',
+  '& > *': {
+    m: 1,
+  },
+  width: '40%',
+}))
 
 // ******* table *******
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -79,39 +48,80 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }))
 
-const CalculateDate = (start:number,stop:number) => {
-  const weekday = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์']
-  let time = ''
-  if(start === 0)     time='ไม่ระบุ'
-  else
-  {
-    const Sdate = new Date(start * 1000)
-    time += weekday[Sdate.getDay()]+' ' + Sdate.getHours() + ':' 
-    if(Sdate.getMinutes()  <10)
-      time+='0'
-    time += Sdate.getMinutes()
-    
-    const Edate = new Date(stop * 1000)
-    time += ' - ' + Edate.getHours() + ':' 
-    if(Edate.getMinutes()  < 10)
-      time+='0'
-    time += Edate.getMinutes() + ' น.'
-  }
- 
-  return time
-}
-
-interface SectionTablesProp {
-  content: Section[]
+// ******* Button variants *****
+type VariantButtonGroupProps = {
+  courseId: string
+  section: Section[]
+  type: SectionType
   selectedSection?: Section
+  setSelectedSection: (s: Section) => void
   handleClick: (section: Section) => void
 }
 
-function SectionTables({ content, selectedSection, handleClick }: SectionTablesProp) {
+const VariantButtonGroup = ({
+  courseId,
+  section,
+  selectedSection,
+  setSelectedSection,
+  handleClick,
+  type,
+}: VariantButtonGroupProps) => {
+  return (
+    <RootVariantButtonGroup>
+      <Typography sx={{ fontWeight: 'bold' }}>{type}</Typography>
+      <ButtonGroup variant="outlined" aria-label="outlined button group">
+        {section.map((element: Section, i) => (
+          <Button
+            key={`${element.id}-${courseId}-${i}`}
+            variant={selectedSection!.id === element.id ? 'contained' : 'outlined'}
+            onClick={() => {
+              handleClick(element)
+              setSelectedSection(element)
+            }}
+          >
+            {element.id === '' ? 'ไม่ระบุ' : element.id}
+          </Button>
+        ))}
+      </ButtonGroup>
+    </RootVariantButtonGroup>
+  )
+}
+
+type SectionTablesProp = {
+  courseId: string
+  content: Section[]
+  selectedSection?: Section
+  setSelectedSection: (s: Section) => void
+  type: SectionType
+  handleClick: (section: Section) => void
+}
+
+export const SectionTables = ({
+  courseId,
+  content,
+  setSelectedSection,
+  selectedSection,
+  handleClick,
+  type,
+}: SectionTablesProp) => {
+  const room = useMemo(() => {
+    if (selectedSection?.room) return selectedSection.room
+    if (selectedSection?.building) return selectedSection.building
+
+    return 'ไม่ระบุ'
+  }, [selectedSection])
+
   return (
     <Box>
       <Box display="flex" gap="2rem" justifyContent="center" sx={{ marginBlockEnd: '1rem' }}>
-        <VariantButtonGroup section={content} selectedSection={selectedSection} handleClick={handleClick} />
+        <VariantButtonGroup
+          courseId={courseId}
+          section={content}
+          selectedSection={selectedSection}
+          setSelectedSection={setSelectedSection}
+          handleClick={handleClick}
+          type={type}
+        />
       </Box>
       <Box display="flex" justifyContent="center" alignItems="center" sx={{ marginBottom: '1rem' }}>
         <TableContainer component={Paper} sx={{ backgroundColor: 'white' }}>
@@ -119,27 +129,27 @@ function SectionTables({ content, selectedSection, handleClick }: SectionTablesP
             <TableHead sx={{ backgroundColor: 'white' }}>
               <TableRow>
                 <StyledTableCell align="center">
-                  {selectedSection?.type || 'ทฤษฎี'} ({selectedSection?.id || 'ไม่ระบุ'})
+                  {type} ({selectedSection!.id || 'ไม่ระบุ'})
                 </StyledTableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               <StyledTableRow>
                 <StyledTableCell align="center">
-               {(selectedSection?.schedule)? CalculateDate(selectedSection?.schedule[0].start,selectedSection?.schedule[0].end)  : CalculateDate(0,0) }
-                <br />
-                {(selectedSection?.schedule && selectedSection?.schedule.length > 20)? 
-                CalculateDate(selectedSection?.schedule[selectedSection?.schedule.length-1].start,selectedSection?.schedule[selectedSection?.schedule.length-1].end): ''}
-                </StyledTableCell>                
+                  {selectedSection!.schedule.length !== 0
+                    ? CalculateDate(selectedSection!.schedule[0].start, selectedSection!.schedule[0].end)
+                    : null}
+                  <br />
+                  {selectedSection!.schedule.length > 20
+                    ? CalculateDate(
+                        selectedSection!.schedule[selectedSection!.schedule.length - 1].start,
+                        selectedSection!.schedule[selectedSection!.schedule.length - 1].end,
+                      )
+                    : null}
+                </StyledTableCell>
               </StyledTableRow>
               <StyledTableRow>
-                <StyledTableCell align="center">
-                  {selectedSection?.room
-                    ? selectedSection.room
-                    : selectedSection?.building
-                    ? selectedSection.building
-                    : 'ไม่ระบุ'}
-                </StyledTableCell>
+                <StyledTableCell align="center">{room}</StyledTableCell>
               </StyledTableRow>
             </TableBody>
           </Table>
@@ -150,52 +160,61 @@ function SectionTables({ content, selectedSection, handleClick }: SectionTablesP
 }
 
 // ******* main *******
-export default function CustomizedTables({ content ,setSec}: { content: Section[], setSec: (section: Section[]) => void }) {
-  const [valueTheory, setValueTheory] = useState<Section>()
-  const [valuePractice, setValuePractice] = useState<Section>()
- 
+type CustomizedTables = {
+  courseWithSection: CourseWithSection
+  selectedSectionTheory?: Section
+  selectedSectionPractice?: Section
+  setSelectedSectionTheory: (s: Section) => void
+  setSelectedSectionPractice: (s: Section) => void
+  handleChangeSection: (courseId: string, section: Section, type: SectionType) => void
+}
+export const CustomizedTables = ({
+  courseWithSection: { course, sectionPractice, sectionTheory },
+  handleChangeSection,
+  setSelectedSectionPractice,
+  setSelectedSectionTheory,
+  selectedSectionPractice,
+  selectedSectionTheory,
+}: CustomizedTables) => {
+  const { theorySection, practiceSection } = useMemo(() => {
+    const theorySection = course.section.filter((s) => s.type === SectionType.Theory)
+    const practiceSection = course.section.filter((s) => s.type === SectionType.Practice)
 
-  const tempSection: Section = {
-    id: '',
-    building: '',
-    room: '',
-    schedule: [{ start: 0, end: 0 }],
-    type: '',
-  }
+    return { theorySection, practiceSection }
+  }, [course])
 
-  const theoryCourse = content.filter((element: Section) => element?.type === 'ทฤษฎี')
-  const practiceCourse = content.filter((element: Section) => element?.type === 'ปฏิบัติ')
- 
+  const handleClickTheory = useCallback(
+    (section: Section) => handleChangeSection(course.id, section, SectionType.Theory),
+    [course.id],
+  )
 
-  const handleClick = (section: Section) => {
-    if (section?.type === 'ทฤษฎี') setValueTheory(section)
-    else setValuePractice(section)
-  }
+  const handleClickPractice = useCallback(
+    (section: Section) => handleChangeSection(course.id, section, SectionType.Practice),
+    [course.id],
+  )
 
-  useEffect(() => {   
-    setValuePractice(practiceCourse[0])
-    setValueTheory(theoryCourse[0])
-    
-  }, [])
-
-  useEffect(() => {   
-      setSec([valueTheory? valueTheory:theoryCourse[0] ,valuePractice?valuePractice:practiceCourse[0]])
-  }, [valueTheory,valuePractice])
-
-  // if (practiceCourse.length) {
-    return (
-      <Box display="flex" justifyContent="center" sx={{ marginBlockEnd: '1rem' }}>
-        {theoryCourse.length? <SectionTables
-          content={theoryCourse}
-          handleClick={handleClick}
-          selectedSection={valueTheory ? valueTheory : tempSection}
-        />:''}
-        {practiceCourse.length? <SectionTables
-          content={practiceCourse}
-          handleClick={handleClick}
-          selectedSection={valuePractice ? valuePractice : tempSection}
-        />:''}
-      </Box>
-    )
-  
+  return (
+    <Box display="flex" justifyContent="center" sx={{ marginBlockEnd: '1rem' }}>
+      {!!theorySection.length && sectionTheory && (
+        <SectionTables
+          courseId={course.id}
+          content={theorySection}
+          handleClick={handleClickTheory}
+          selectedSection={selectedSectionTheory}
+          setSelectedSection={(s) => setSelectedSectionTheory(s)}
+          type={SectionType.Theory}
+        />
+      )}
+      {!!practiceSection.length && sectionPractice && (
+        <SectionTables
+          courseId={course.id}
+          content={practiceSection}
+          handleClick={handleClickPractice}
+          selectedSection={selectedSectionPractice}
+          setSelectedSection={(s) => setSelectedSectionPractice(s)}
+          type={SectionType.Practice}
+        />
+      )}
+    </Box>
+  )
 }
