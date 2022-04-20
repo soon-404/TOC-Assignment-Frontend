@@ -11,6 +11,7 @@ import { useStore } from 'hooks/useStore'
 
 import { DomRect, EventToCalendar } from 'types'
 import SearchBar from 'components/SearchBar'
+import { isDateRange } from 'types/guard'
 
 export const MajorSchedule = () => {
   const { freeCourses, selectedCourses } = useStore()
@@ -24,7 +25,7 @@ export const MajorSchedule = () => {
       flattenDeep(
         selectedCourses
           .filter(({ course }) => !!course.section.length)
-          .map(({ course, sectionPractice, sectionTheory }) =>
+          .map<Array<Array<EventToCalendar> | EventToCalendar>>(({ course, sectionPractice, sectionTheory }) =>
             compact([
               sectionPractice?.schedule.map<EventToCalendar>(({ start, end }) => ({
                 title: course.name,
@@ -38,6 +39,22 @@ export const MajorSchedule = () => {
                 end: moment.unix(end),
                 color: '#f107a3',
               })) ?? null,
+              isDateRange(course.midterm)
+                ? {
+                    title: course.name,
+                    start: moment.unix(course.midterm.start),
+                    end: moment.unix(course.midterm.end),
+                    color: '#f1b307',
+                  }
+                : null,
+              isDateRange(course.final)
+                ? {
+                    title: course.name,
+                    start: moment.unix(course.final.start),
+                    end: moment.unix(course.final.end),
+                    color: '#f93201',
+                  }
+                : null,
             ]),
           ),
       ),
