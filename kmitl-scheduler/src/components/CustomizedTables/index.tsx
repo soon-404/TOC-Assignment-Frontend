@@ -54,18 +54,10 @@ type VariantButtonGroupProps = {
   section: Section[]
   type: SectionType
   selectedSection?: Section
-  setSelectedSection: (s: Section) => void
   handleClick: (section: Section) => void
 }
 
-const VariantButtonGroup = ({
-  courseId,
-  section,
-  selectedSection,
-  setSelectedSection,
-  handleClick,
-  type,
-}: VariantButtonGroupProps) => {
+const VariantButtonGroup = ({ courseId, section, selectedSection, handleClick, type }: VariantButtonGroupProps) => {
   return (
     <RootVariantButtonGroup>
       <Typography sx={{ fontWeight: 'bold' }}>{type}</Typography>
@@ -74,10 +66,7 @@ const VariantButtonGroup = ({
           <Button
             key={`${element.id}-${courseId}-${i}`}
             variant={selectedSection!.id === element.id ? 'contained' : 'outlined'}
-            onClick={() => {
-              handleClick(element)
-              setSelectedSection(element)
-            }}
+            onClick={() => handleClick(element)}
           >
             {element.id === '' ? 'ไม่ระบุ' : element.id}
           </Button>
@@ -91,19 +80,11 @@ type SectionTablesProp = {
   courseId: string
   content: Section[]
   selectedSection?: Section
-  setSelectedSection: (s: Section) => void
   type: SectionType
   handleClick: (section: Section) => void
 }
 
-export const SectionTables = ({
-  courseId,
-  content,
-  setSelectedSection,
-  selectedSection,
-  handleClick,
-  type,
-}: SectionTablesProp) => {
+export const SectionTables = ({ courseId, content, selectedSection, handleClick, type }: SectionTablesProp) => {
   const room = useMemo(() => {
     if (selectedSection?.room) return selectedSection.room
     if (selectedSection?.building) return selectedSection.building
@@ -118,7 +99,6 @@ export const SectionTables = ({
           courseId={courseId}
           section={content}
           selectedSection={selectedSection}
-          setSelectedSection={setSelectedSection}
           handleClick={handleClick}
           type={type}
         />
@@ -162,19 +142,11 @@ export const SectionTables = ({
 // ******* main *******
 type CustomizedTables = {
   courseWithSection: CourseWithSection
-  selectedSectionTheory?: Section
-  selectedSectionPractice?: Section
-  setSelectedSectionTheory: (s: Section) => void
-  setSelectedSectionPractice: (s: Section) => void
   handleChangeSection: (courseId: string, section: Section, type: SectionType) => void
 }
 export const CustomizedTables = ({
-  courseWithSection: { course, sectionPractice, sectionTheory },
+  courseWithSection: { course, sectionPractice: selectedSectionPractice, sectionTheory: selectedSectionTheory },
   handleChangeSection,
-  setSelectedSectionPractice,
-  setSelectedSectionTheory,
-  selectedSectionPractice,
-  selectedSectionTheory,
 }: CustomizedTables) => {
   const { theorySection, practiceSection } = useMemo(() => {
     const theorySection = course.section.filter((s) => s.type === SectionType.Theory)
@@ -195,23 +167,21 @@ export const CustomizedTables = ({
 
   return (
     <Box display="flex" justifyContent="center" sx={{ marginBlockEnd: '1rem' }}>
-      {!!theorySection.length && sectionTheory && (
+      {!!theorySection.length && selectedSectionTheory && (
         <SectionTables
           courseId={course.id}
           content={theorySection}
           handleClick={handleClickTheory}
           selectedSection={selectedSectionTheory}
-          setSelectedSection={(s) => setSelectedSectionTheory(s)}
           type={SectionType.Theory}
         />
       )}
-      {!!practiceSection.length && sectionPractice && (
+      {!!practiceSection.length && selectedSectionPractice && (
         <SectionTables
           courseId={course.id}
           content={practiceSection}
           handleClick={handleClickPractice}
           selectedSection={selectedSectionPractice}
-          setSelectedSection={(s) => setSelectedSectionPractice(s)}
           type={SectionType.Practice}
         />
       )}

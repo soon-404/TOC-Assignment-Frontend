@@ -52,7 +52,7 @@ export const DragZone = ({ color, courses = [], dropZonesDomRects }: DragZonePro
           key={`DragZone-${courseWithSection.course.id}-${idx}`}
           color={color}
           label={courseWithSection.course.name}
-          onDoubleClick={() => open(<BlockDetailDialog courseWithSection={courseWithSection} from="dragzone" />)}
+          onDoubleClick={() => open(<BlockDetailDialog courseId={courseWithSection.course.id} from="dragzone" />)}
           onDragEnd={(_, info) => handleOnDragEnd(courseWithSection, info)}
         />
       ))}

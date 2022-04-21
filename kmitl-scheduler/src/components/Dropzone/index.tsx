@@ -74,7 +74,7 @@ export const DropZone: React.FC<IDropZone> = ({ color, courses = [], dropZonesDo
           color={color}
           label={courseWithSection.course.name}
           isCoordsInBox={isCoordsInBox}
-          onDoubleClick={() => open(<BlockDetailDialog courseWithSection={courseWithSection} from="dropzone" />)}
+          onDoubleClick={() => open(<BlockDetailDialog courseId={courseWithSection.course.id} from="dropzone" />)}
           onDragEnd={(_, info) => handleOnDragEnd(courseWithSection, info)}
         />
       ))}

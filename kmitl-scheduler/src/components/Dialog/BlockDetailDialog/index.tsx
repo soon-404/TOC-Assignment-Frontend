@@ -7,7 +7,6 @@ import AlarmAddIcon from '@mui/icons-material/AlarmAdd'
 import AutoDeleteIcon from '@mui/icons-material/AutoDelete'
 import { CustomizedTables } from 'components/CustomizedTables'
 import { insertSectionToWholeCourse } from 'utils/insertSectionToWholeCourse'
-import { cloneDeep } from 'lodash'
 
 interface LineInfoProps {
   id: string
@@ -110,41 +109,28 @@ type KeyOfBlockDetailPickOut = keyof BlockDetailPickOut
 type CopyableKey = Extract<KeyOfBlockDetailPickOut, 'id' | 'name'>
 
 interface BlockDetailDialogProps {
-  courseWithSection: CourseWithSection
+  courseId: Course['id']
   from: 'dragzone' | 'dropzone'
 }
 
 const CopyableKey: string[] = ['id', 'name'] as CopyableKey[]
 
-export const BlockDetailDialog = ({ courseWithSection, from }: BlockDetailDialogProps) => {
-  const { course } = courseWithSection
-  const filteredCourseKey: BlockDetailPickOut = course
-
+export const BlockDetailDialog = ({ courseId, from }: BlockDetailDialogProps) => {
   const { freeCourses, setFreeCourses, selectedCourses, setSelectedCourses } = useStore()
 
-  const [selectedSectionTheory, _setSelectedSectionTheory] = useState<Section | undefined>(
-    courseWithSection.sectionTheory,
-  )
-  const [selectedSectionPractice, _setSelectedSectionPractice] = useState<Section | undefined>(
-    courseWithSection.sectionPractice,
-  )
+  const { courseWithSection, isSelected } = useMemo(() => {
+    let courseWithSection: CourseWithSection | undefined
 
-  const setSelectedSectionTheory = (s: Section) => _setSelectedSectionTheory(s)
-  const setSelectedSectionPractice = (s: Section) => _setSelectedSectionPractice(s)
+    courseWithSection = freeCourses.find(({ course }) => course.id === courseId)
+    if (courseWithSection) return { courseWithSection, isSelected: false }
+    courseWithSection = selectedCourses.find(({ course }) => course.id === courseId)
+    if (courseWithSection) return { courseWithSection, isSelected: true }
 
-  const isSelected = useMemo(
-    () => !!selectedCourses.find((_courseWithSection) => _courseWithSection.course?.id === course?.id),
-    [selectedCourses, course.id],
-  )
+    throw new TypeError('_courseWithSection is undefined')
+  }, [freeCourses, selectedCourses, from])
 
-  const courseWithSectionLatest = useMemo(
-    () => ({
-      course,
-      sectionPractice: selectedSectionPractice,
-      sectionTheory: selectedSectionTheory,
-    }),
-    [course, selectedSectionPractice, selectedSectionTheory],
-  )
+  const { course } = courseWithSection
+  const filteredCourseKey: BlockDetailPickOut = courseWithSection.course
 
   const handleAddCourse = useCallback(
     (courseWithSection: CourseWithSection) => {
@@ -172,19 +158,9 @@ export const BlockDetailDialog = ({ courseWithSection, from }: BlockDetailDialog
     if (courseIndex < 0) return
 
     if (from === 'dragzone') {
-      setFreeCourses((prev) => {
-        const newValue = type === SectionType.Practice ? { sectionPractice: section } : { sectionTheory: section }
-        const newArr = cloneDeep(prev)
-        newArr[courseIndex] = { ...prev[courseIndex], ...newValue }
-        return newArr
-      })
+      setFreeCourses((prev) => insertSectionToWholeCourse(courseIndex, section, prev, type))
     } else if (from === 'dropzone') {
-      setSelectedCourses((prev) => {
-        const newValue = type === SectionType.Practice ? { sectionPractice: section } : { sectionTheory: section }
-        const newArr = cloneDeep(prev)
-        newArr[courseIndex] = { ...prev[courseIndex], ...newValue }
-        return newArr
-      })
+      setSelectedCourses((prev) => insertSectionToWholeCourse(courseIndex, section, prev, type))
     }
   }
 
@@ -206,7 +182,6 @@ export const BlockDetailDialog = ({ courseWithSection, from }: BlockDetailDialog
           <ContentCopyIcon fontSize="small" />
         </IconButton>
       </Box>
-
       <Box display="flex" justifyContent="space-between" sx={{ marginBlockEnd: '1rem' }}>
         <Typography variant="body1" sx={{ whiteSpace: 'nowrap' }}>
           ชั้นปีการศึกษา :{course.class_year}
@@ -218,34 +193,19 @@ export const BlockDetailDialog = ({ courseWithSection, from }: BlockDetailDialog
           หน่วยกิต :{course.credit}
         </Typography>
       </Box>
-
-      {/* Table */}
-      <CustomizedTables
-        courseWithSection={courseWithSection}
-        selectedSectionTheory={selectedSectionTheory}
-        selectedSectionPractice={selectedSectionPractice}
-        setSelectedSectionTheory={setSelectedSectionTheory}
-        setSelectedSectionPractice={setSelectedSectionPractice}
-        handleChangeSection={handleChangeSection}
-      />
-
-      {/* footer */}
+      <CustomizedTables courseWithSection={courseWithSection} handleChangeSection={handleChangeSection} />
       <LineInfo
         id={'teacher'}
         label={'อาจารย์ผู้สอน'}
         values={filteredCourseKey['teacher'].length ? filteredCourseKey['teacher'] : ['ยังไม่ประกาศ']}
         isCopyable={false}
       />
-
       <DateInfo type={'midterm'} values={course.midterm || 'ยังไม่ประกาศ'} />
       <DateInfo type={'final'} values={course.final || 'ยังไม่ประกาศ'} />
-
       <Button
         variant={isSelected ? 'outlined' : 'contained'}
         startIcon={isSelected ? <AutoDeleteIcon /> : <AlarmAddIcon />}
-        onClick={() =>
-          isSelected ? handleRemoveCourse(courseWithSectionLatest) : handleAddCourse(courseWithSectionLatest)
-        }
+        onClick={() => (isSelected ? handleRemoveCourse(courseWithSection) : handleAddCourse(courseWithSection))}
         sx={{ float: 'right', marginTop: '2rem' }}
       >
         {isSelected ? 'remove from schedule' : 'add to schedule'}
@@ -253,8 +213,3 @@ export const BlockDetailDialog = ({ courseWithSection, from }: BlockDetailDialog
     </Box>
   )
 }
-
-//  ------------------- note -------------
-// 1.กด add ซ้ำๆแล้ว course หาย
-// 3. ลากคืน แล้ว sec หาย
-// 4. กด remove แล้ว selected course in context หายหมด
