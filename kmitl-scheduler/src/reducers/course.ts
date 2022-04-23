@@ -128,7 +128,7 @@ export const reducer: Reducer<State, Action> = (state, action) => {
     }
     case ActionType.SetSection: {
       const { courseId, section, sectionType } = action
-      set(state, `sectionMappin[${courseId}][${sectionType}]`, section)
+      set(state, `sectionMapping[${courseId}][${sectionType}]`, section)
       return { ...state }
     }
   }
