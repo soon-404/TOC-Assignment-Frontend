@@ -1,12 +1,12 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { Box, Button, IconButton, Typography } from '@mui/material'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
-import { Course, DateRange, Section, CourseWithSection, SectionType } from 'types'
+import { CourseId, CourseType, DateRange } from 'types'
 import { useStore } from 'hooks/useStore'
 import AlarmAddIcon from '@mui/icons-material/AlarmAdd'
 import AutoDeleteIcon from '@mui/icons-material/AutoDelete'
 import { CustomizedTables } from 'components/CustomizedTables'
-import { insertSectionToWholeCourse } from 'utils/insertSectionToWholeCourse'
+import { isCourseSelected } from 'utils/course'
 
 interface LineInfoProps {
   id: string
@@ -104,71 +104,22 @@ const DateInfo = ({ type, values }: DateInfoProps) => {
   )
 }
 
-type BlockDetailPickOut = Omit<Course, 'midterm' | 'final' | 'section'>
-type KeyOfBlockDetailPickOut = keyof BlockDetailPickOut
-type CopyableKey = Extract<KeyOfBlockDetailPickOut, 'id' | 'name'>
-
 interface BlockDetailDialogProps {
   courseId: CourseId
-  from: 'dragzone' | 'dropzone'
+  courseType: CourseType
 }
 
-const CopyableKey: string[] = ['id', 'name'] as CopyableKey[]
+export const BlockDetailDialog = ({ courseId, courseType }: BlockDetailDialogProps) => {
+  const { allCourses, addCourse, deleteCourse, selectedCourses } = useStore()
+  const { class_year, name, course_type, credit, midterm, final, teacher } = allCourses[courseId]
 
-export const BlockDetailDialog = ({ courseId, from }: BlockDetailDialogProps) => {
-  const { freeCourses, setFreeCourses, selectedCourses, setSelectedCourses } = useStore()
-
-  const { courseWithSection, isSelected } = useMemo(() => {
-    let courseWithSection: CourseWithSection | undefined
-
-    courseWithSection = freeCourses.find(({ course }) => course.id === courseId)
-    if (courseWithSection) return { courseWithSection, isSelected: false }
-    courseWithSection = selectedCourses.find(({ course }) => course.id === courseId)
-    if (courseWithSection) return { courseWithSection, isSelected: true }
-
-    throw new TypeError('_courseWithSection is undefined')
-  }, [freeCourses, selectedCourses, from])
-
-  const { course } = courseWithSection
-  const filteredCourseKey: BlockDetailPickOut = courseWithSection.course
-
-  const handleAddCourse = useCallback(
-    (courseWithSection: CourseWithSection) => {
-      const leftedBlocks = freeCourses.filter(({ course }) => course.id !== courseWithSection.course.id)
-      setFreeCourses([...leftedBlocks])
-      setSelectedCourses((prev) => [...prev, courseWithSection])
-    },
-    [freeCourses, setFreeCourses, setSelectedCourses],
-  )
-
-  const handleRemoveCourse = useCallback(
-    (courseWithSection: CourseWithSection) => {
-      const leftedBlocks = selectedCourses.filter(({ course }) => course.id !== courseWithSection.course.id)
-      setSelectedCourses([...leftedBlocks])
-      setFreeCourses((prev) => [...prev, courseWithSection])
-    },
-    [selectedCourses, setFreeCourses, setSelectedCourses],
-  )
-
-  const handleChangeSection = (courseId: string, section: Section, type: SectionType) => {
-    const courseIndex = (from === 'dragzone' ? freeCourses : selectedCourses).findIndex(
-      (courseWithSection) => courseWithSection.course.id === courseId,
-    )
-
-    if (courseIndex < 0) return
-
-    if (from === 'dragzone') {
-      setFreeCourses((prev) => insertSectionToWholeCourse(courseIndex, section, prev, type))
-    } else if (from === 'dropzone') {
-      setSelectedCourses((prev) => insertSectionToWholeCourse(courseIndex, section, prev, type))
-    }
-  }
+  const isSelected = useMemo(() => isCourseSelected(courseId, selectedCourses[courseType]), [])
 
   return (
     <Box>
       <Box display="flex" justifyContent="center" alignItems="center" sx={{ marginBottom: '1rem' }}>
         <Typography id="courseNameAndId" variant="h6">
-          {course.name} ({course.id})
+          {name} ({courseId})
         </Typography>
         <IconButton
           onClick={() => {
@@ -184,28 +135,28 @@ export const BlockDetailDialog = ({ courseId, from }: BlockDetailDialogProps) =>
       </Box>
       <Box display="flex" justifyContent="space-between" sx={{ marginBlockEnd: '1rem' }}>
         <Typography variant="body1" sx={{ whiteSpace: 'nowrap' }}>
-          ชั้นปีการศึกษา :{course.class_year}
+          ชั้นปีการศึกษา :{class_year}
         </Typography>
         <Typography variant="body1" sx={{ whiteSpace: 'nowrap' }}>
-          หมวดวิชา :{course.course_type}
+          หมวดวิชา :{course_type}
         </Typography>
         <Typography variant="body1" sx={{ whiteSpace: 'nowrap' }}>
-          หน่วยกิต :{course.credit}
+          หน่วยกิต :{credit}
         </Typography>
       </Box>
-      <CustomizedTables courseWithSection={courseWithSection} handleChangeSection={handleChangeSection} />
+      <CustomizedTables courseId={courseId} />
       <LineInfo
         id={'teacher'}
         label={'อาจารย์ผู้สอน'}
-        values={filteredCourseKey['teacher'].length ? filteredCourseKey['teacher'] : ['ยังไม่ประกาศ']}
+        values={teacher.length ? teacher : ['ยังไม่ประกาศ']}
         isCopyable={false}
       />
-      <DateInfo type={'midterm'} values={course.midterm || 'ยังไม่ประกาศ'} />
-      <DateInfo type={'final'} values={course.final || 'ยังไม่ประกาศ'} />
+      <DateInfo type={'midterm'} values={midterm || 'ยังไม่ประกาศ'} />
+      <DateInfo type={'final'} values={final || 'ยังไม่ประกาศ'} />
       <Button
         variant={isSelected ? 'outlined' : 'contained'}
         startIcon={isSelected ? <AutoDeleteIcon /> : <AlarmAddIcon />}
-        onClick={() => (isSelected ? handleRemoveCourse(courseWithSection) : handleAddCourse(courseWithSection))}
+        onClick={() => (isSelected ? deleteCourse(courseId) : addCourse(courseId))}
         sx={{ float: 'right', marginTop: '2rem' }}
       >
         {isSelected ? 'remove from schedule' : 'add to schedule'}

@@ -1,125 +1,69 @@
-import { createContext, ReactNode, Dispatch, useState, SetStateAction, FC, useEffect, useReducer } from 'react'
-import { Course, CourseWithSection, ClassYear, ApiTablesData, SectionType } from 'types'
-
+import { createContext, ReactNode, Dispatch, useState, SetStateAction, FC, useEffect, useReducer, Reducer } from 'react'
 import { httpClient } from 'api/httpClient'
+import { ActionType, State, Action } from 'reducers/course'
+import { ClassYear, ApiTablesData, CourseId, Section, SectionType } from 'types'
 
-interface IStoreContext {
+interface IStoreContext extends State {
   activeStep: number
   setActiveStep: Dispatch<SetStateAction<number>>
   classYear: ClassYear | null
   setClassYear: Dispatch<SetStateAction<ClassYear | null>>
-  freeCourses: CourseWithSection[]
-  setFreeCourses: Dispatch<SetStateAction<CourseWithSection[]>>
-  selectedCourses: CourseWithSection[]
-  setSelectedCourses: Dispatch<SetStateAction<CourseWithSection[]>>
-  isAllCourseLoading: boolean
-  allCourseErrorMsg: string | false
-}
-
-type State = {
-  data?: HNResponse
-  isLoading: boolean
-  error?: string
-}
-
-type HNResponse = {
-  hits: {
-    title: string
-    objectID: string
-    url: string
-  }[]
-}
-
-type Action = { type: 'request' } | { type: 'success'; results: HNResponse } | { type: 'failure'; error: string }
-
-const reducer = (state: State, action: Action): State => {
-  switch (action.type) {
-    case 'request':
-      return { isLoading: true }
-    case 'success':
-      return { isLoading: false, data: action.results }
-    case 'failure':
-      return { isLoading: false, error: action.error }
-  }
+  addCourse: (courseId: CourseId) => void
+  deleteCourse: (courseId: CourseId) => void
+  setSection: (courseId: CourseId, section: Section, sectionType: SectionType) => void
 }
 
 interface StoreProviderProps {
   children: ReactNode
+  reducer: Reducer<State, Action>
+  initialState: State
 }
 
 export const StoreContext = createContext<IStoreContext>({} as IStoreContext)
 
-export const StoreProvider: FC<StoreProviderProps> = ({ children, reducer }) => {
+export const StoreProvider: FC<StoreProviderProps> = ({ children, reducer, initialState }) => {
   const [activeStep, setActiveStep] = useState<number>(0)
   const [classYear, setClassYear] = useState<ClassYear | null>('2') // TODO : set default `null`
+  const [state, dispatch] = useReducer(reducer, initialState)
 
-  const [allCourses, setAllCourses] = useState<Course[] | undefined>()
-  const [freeCourses, setFreeCourses] = useState<CourseWithSection[]>([])
-  const [selectedCourses, setSelectedCourses] = useState<CourseWithSection[]>([])
+  const addCourse = (courseId: CourseId) => dispatch({ type: ActionType.Add, courseId })
+  const deleteCourse = (courseId: CourseId) => dispatch({ type: ActionType.Delete, courseId })
 
-  const [isAllCourseLoading, setIsAllCourseLoading] = useState<boolean>(false)
-  const [allCourseErrorMsg, setAllCourseErrorMsg] = useState<string | false>(false)
+  const setSection = (courseId: CourseId, section: Section, sectionType: SectionType) =>
+    dispatch({ type: ActionType.SetSection, courseId, section, sectionType })
 
-  const [state, dispatch] = useReducer(reducer, { isLoading: false })
-
-  // * Enable this to log `allCourses`
-  // useEffect(() => console.log('all courses', allCourses), [allCourses])
-  // useEffect(
-  //   () =>
-  //     console.log(
-  //       'all courses',
-  //       allCourses?.find((course) => course.name === 'DEVELOPMENT OF READING AND WRITING SKILLS IN ENGLISH'),
-  //     ),
-  //   [allCourses],
-  // )
+  useEffect(() => {
+    console.log('x', state.unselectedCourses.main, state.selectedCourses.main)
+  }, [state])
 
   useEffect(() => {
     const fetchTables = async () => {
-      setIsAllCourseLoading(true)
-
       const {
-        data: { data: courses, success },
+        data: { data: _courses, success },
       } = await httpClient.get<ApiTablesData>('/tables')
       if (!success) {
-        setAllCourseErrorMsg('something wrong')
-        setIsAllCourseLoading(false)
+        throw new Error('fetch all courses error')
+      }
+      if (!classYear) {
         return
       }
 
-      setAllCourses(courses.filter((course) => !!course && !!course?.id && !!course?.section))
-      setIsAllCourseLoading(false)
+      dispatch({ type: ActionType.Init, courses: _courses, classYear: classYear })
     }
 
     fetchTables()
-  }, [])
+  }, [classYear])
 
-  useEffect(() => {
-    if (!allCourses) return
-
-    if (activeStep === 1) {
-      const suggestCourses: CourseWithSection[] = allCourses
-        .filter((course) => course.class_year === classYear)
-        .map((course) => ({
-          course: course,
-          sectionPractice: course.section.find((section) => section?.type === SectionType.Practice),
-          sectionTheory: course.section.find((section) => section?.type === SectionType.Theory),
-        }))
-      setFreeCourses(suggestCourses)
-    }
-  }, [activeStep, allCourses])
-
-  const _value = {
+  const value = {
     activeStep, //  step การทำงานที่กำลัง active อยู่ตอนนี้
     setActiveStep,
     classYear,
     setClassYear,
-    freeCourses,
-    setFreeCourses,
-    selectedCourses, // วิชาที่ user เลือก
-    setSelectedCourses,
-    isAllCourseLoading,
-    allCourseErrorMsg,
+    addCourse,
+    deleteCourse,
+    setSection,
+    ...state,
   }
 
-  return <StoreContext.Provider value={_value}>{children}</StoreContext.Provider>
+  return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>
 }

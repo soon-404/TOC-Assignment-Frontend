@@ -77,6 +77,7 @@ export type EventToCalendar = {
   end: Moment
   color: string
 }
+
 export type CourseId = Course['id']
 export type CourseField = Omit<Course, 'id'>
 export type CourseTables = Record<CourseId, CourseField>
@@ -86,10 +87,4 @@ export enum CourseType {
   Option = 'option',
 }
 
-export type SectionMapping = Record<
-  CourseId,
-  {
-    sectionTheory?: Section
-    sectionPractice?: Section
-  }
->
+export type SectionMapping = Record<CourseId, Partial<Record<SectionType, Section>>>

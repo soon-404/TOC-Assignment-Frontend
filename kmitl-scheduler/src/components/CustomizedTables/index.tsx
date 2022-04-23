@@ -1,5 +1,5 @@
-import { useCallback, useMemo, useState } from 'react'
-import { Course, Section, SectionType } from 'types'
+import { useMemo } from 'react'
+import { CourseId, Section, SectionType } from 'types'
 import {
   styled,
   Table,
@@ -17,7 +17,7 @@ import {
 } from '@mui/material'
 import { lightBlue } from '@mui/material/colors'
 import { CalculateDate } from 'utils/calculateDate'
-import { CourseWithSection } from 'types'
+import { useStore } from 'hooks/useStore'
 
 const RootVariantButtonGroup = styled(Box)(() => ({
   display: 'flex',
@@ -30,7 +30,6 @@ const RootVariantButtonGroup = styled(Box)(() => ({
   width: '40%',
 }))
 
-// ******* table *******
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: lightBlue[800],
@@ -41,34 +40,33 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   },
 }))
 
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  // hide last border
+const StyledTableRow = styled(TableRow)(() => ({
   '&:last-child td, &:last-child th': {
     border: 10,
   },
 }))
 
-// ******* Button variants *****
-type VariantButtonGroupProps = {
+type SectionTablesProp = {
   courseId: string
   section: Section[]
-  type: SectionType
-  selectedSection?: Section
-  handleClick: (section: Section) => void
+  selectedSection: Section
+  sectionType: SectionType
 }
 
-const VariantButtonGroup = ({ courseId, section, selectedSection, handleClick, type }: VariantButtonGroupProps) => {
+const VariantButtonGroup = ({ courseId, section, selectedSection, sectionType }: SectionTablesProp) => {
+  const { setSection } = useStore()
+
   return (
     <RootVariantButtonGroup>
-      <Typography sx={{ fontWeight: 'bold' }}>{type}</Typography>
+      <Typography sx={{ fontWeight: 'bold' }}>{sectionType}</Typography>
       <ButtonGroup variant="outlined" aria-label="outlined button group">
-        {section.map((element: Section, i) => (
+        {section.map((section: Section, idx: number) => (
           <Button
-            key={`${element.id}-${courseId}-${i}`}
-            variant={selectedSection!.id === element.id ? 'contained' : 'outlined'}
-            onClick={() => handleClick(element)}
+            key={`${section.id}-${courseId}-${idx}`}
+            variant={selectedSection.id === section.id ? 'contained' : 'outlined'}
+            onClick={() => setSection(courseId, section, sectionType)}
           >
-            {element.id === '' ? 'ไม่ระบุ' : element.id}
+            {section.id === '' ? 'ไม่ระบุ' : section.id}
           </Button>
         ))}
       </ButtonGroup>
@@ -76,15 +74,7 @@ const VariantButtonGroup = ({ courseId, section, selectedSection, handleClick, t
   )
 }
 
-type SectionTablesProp = {
-  courseId: string
-  content: Section[]
-  selectedSection?: Section
-  type: SectionType
-  handleClick: (section: Section) => void
-}
-
-export const SectionTables = ({ courseId, content, selectedSection, handleClick, type }: SectionTablesProp) => {
+export const SectionTables = ({ courseId, section, selectedSection, sectionType }: SectionTablesProp) => {
   const room = useMemo(() => {
     if (selectedSection?.room) return selectedSection.room
     if (selectedSection?.building) return selectedSection.building
@@ -97,10 +87,9 @@ export const SectionTables = ({ courseId, content, selectedSection, handleClick,
       <Box display="flex" gap="2rem" justifyContent="center" sx={{ marginBlockEnd: '1rem' }}>
         <VariantButtonGroup
           courseId={courseId}
-          section={content}
+          section={section}
           selectedSection={selectedSection}
-          handleClick={handleClick}
-          type={type}
+          sectionType={sectionType}
         />
       </Box>
       <Box display="flex" justifyContent="center" alignItems="center" sx={{ marginBottom: '1rem' }}>
@@ -109,7 +98,7 @@ export const SectionTables = ({ courseId, content, selectedSection, handleClick,
             <TableHead sx={{ backgroundColor: 'white' }}>
               <TableRow>
                 <StyledTableCell align="center">
-                  {type} ({selectedSection!.id || 'ไม่ระบุ'})
+                  {sectionType} ({selectedSection!.id || 'ไม่ระบุ'})
                 </StyledTableCell>
               </TableRow>
             </TableHead>
@@ -139,50 +128,37 @@ export const SectionTables = ({ courseId, content, selectedSection, handleClick,
   )
 }
 
-// ******* main *******
-type CustomizedTables = {
-  courseWithSection: CourseWithSection
-  handleChangeSection: (courseId: string, section: Section, type: SectionType) => void
+type CustomizedTablesProps = {
+  courseId: CourseId
 }
-export const CustomizedTables = ({
-  courseWithSection: { course, sectionPractice: selectedSectionPractice, sectionTheory: selectedSectionTheory },
-  handleChangeSection,
-}: CustomizedTables) => {
-  const { theorySection, practiceSection } = useMemo(() => {
-    const theorySection = course.section.filter((s) => s.type === SectionType.Theory)
-    const practiceSection = course.section.filter((s) => s.type === SectionType.Practice)
 
-    return { theorySection, practiceSection }
-  }, [course])
+export const CustomizedTables = ({ courseId }: CustomizedTablesProps) => {
+  const { allCourses, sectionMapping } = useStore()
 
-  const handleClickTheory = useCallback(
-    (section: Section) => handleChangeSection(course.id, section, SectionType.Theory),
-    [course.id],
-  )
+  const { theorySections, practiceSections } = useMemo(() => {
+    const theorySections = allCourses[courseId].section.filter((section) => section.type === SectionType.Theory)
+    const practiceSections = allCourses[courseId].section.filter((section) => section.type === SectionType.Practice)
+    return { theorySections, practiceSections }
+  }, [allCourses])
 
-  const handleClickPractice = useCallback(
-    (section: Section) => handleChangeSection(course.id, section, SectionType.Practice),
-    [course.id],
-  )
-
+  const selectedTheorySection = sectionMapping[courseId][SectionType.Theory]
+  const selectedPracticeSection = sectionMapping[courseId][SectionType.Practice]
   return (
     <Box display="flex" justifyContent="center" sx={{ marginBlockEnd: '1rem' }}>
-      {!!theorySection.length && selectedSectionTheory && (
+      {!!theorySections.length && !!selectedTheorySection && (
         <SectionTables
-          courseId={course.id}
-          content={theorySection}
-          handleClick={handleClickTheory}
-          selectedSection={selectedSectionTheory}
-          type={SectionType.Theory}
+          courseId={courseId}
+          section={theorySections}
+          selectedSection={selectedTheorySection}
+          sectionType={SectionType.Theory}
         />
       )}
-      {!!practiceSection.length && selectedSectionPractice && (
+      {!!practiceSections.length && !!selectedPracticeSection && (
         <SectionTables
-          courseId={course.id}
-          content={practiceSection}
-          handleClick={handleClickPractice}
-          selectedSection={selectedSectionPractice}
-          type={SectionType.Practice}
+          courseId={courseId}
+          section={practiceSections}
+          selectedSection={selectedPracticeSection}
+          sectionType={SectionType.Practice}
         />
       )}
     </Box>

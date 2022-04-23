@@ -1,4 +1,4 @@
-import React from 'react'
+import { FC } from 'react'
 import { Step, StepButton, Stepper, styled, Typography } from '@mui/material'
 import { useStore } from 'hooks/useStore'
 
@@ -21,7 +21,7 @@ const ButtonTypography = styled(Typography)(() => ({
   },
 }))
 
-export const SchedulerStepper: React.FC = () => {
+export const SchedulerStepper: FC = () => {
   const { activeStep, setActiveStep } = useStore()
 
   return (

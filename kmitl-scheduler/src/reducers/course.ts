@@ -1,12 +1,23 @@
 import { Reducer } from 'react'
-import { concat } from 'lodash'
+import { concat, set } from 'lodash'
 import { getCourseType, isValidToAdd, isValidToDelete } from 'utils/course'
-import { Course, CourseTables, SectionMapping, CourseId, CourseType, CourseField, SectionType } from 'types'
+import {
+  Course,
+  CourseTables,
+  SectionMapping,
+  CourseId,
+  CourseType,
+  CourseField,
+  SectionType,
+  Section,
+  ClassYear,
+} from 'types'
 
 export enum ActionType {
   Add = 'add course',
   Delete = 'delete course',
   Init = 'init all courses',
+  SetSection = 'set section',
 }
 
 export type State = {
@@ -28,10 +39,18 @@ type DeleteAction = {
 
 type InitAction = {
   type: ActionType.Init
+  classYear: ClassYear
   courses: Course[]
 }
 
-export type Action = AddAction | DeleteAction | InitAction
+type SetSectionAction = {
+  type: ActionType.SetSection
+  courseId: CourseId
+  section: Section
+  sectionType: SectionType
+}
+
+export type Action = AddAction | DeleteAction | InitAction | SetSectionAction
 
 export const reducer: Reducer<State, Action> = (state, action) => {
   switch (action.type) {
@@ -80,13 +99,44 @@ export const reducer: Reducer<State, Action> = (state, action) => {
         if (!Object.keys(allCourses).includes(course.id)) {
           allCourses[course.id] = course as CourseField
           sectionMapping[course.id] = {
-            sectionPractice: course.section.find((section) => section?.type === SectionType.Practice),
-            sectionTheory: course.section.find((section) => section?.type === SectionType.Theory),
+            [SectionType.Practice]: course.section.find((section) => section?.type === SectionType.Practice),
+            [SectionType.Theory]: course.section.find((section) => section?.type === SectionType.Theory),
           }
         }
       }
 
-      return { ...state, allCourses }
+      const suggestMainCourses: CourseId[] = Object.keys(allCourses)
+        .filter(
+          (courseId) =>
+            allCourses[courseId].class_year === action.classYear && allCourses[courseId].course_type === 'department',
+        )
+        .map((courseId) => courseId)
+
+      const suggestOptionCourses: CourseId[] = Object.keys(allCourses)
+        .filter(
+          (courseId) =>
+            allCourses[courseId].class_year === action.classYear && allCourses[courseId].course_type !== 'department',
+        )
+        .map((courseId) => courseId)
+
+      return {
+        ...state,
+        allCourses,
+        sectionMapping,
+        unselectedCourses: { main: suggestMainCourses, option: suggestOptionCourses },
+      }
+    }
+    case ActionType.SetSection: {
+      const { courseId, section, sectionType } = action
+      set(state, `sectionMappin[${courseId}][${sectionType}]`, section)
+      return { ...state }
     }
   }
+}
+
+export const initialState: State = {
+  allCourses: {},
+  sectionMapping: {},
+  selectedCourses: { main: [], option: [] },
+  unselectedCourses: { main: [], option: [] },
 }

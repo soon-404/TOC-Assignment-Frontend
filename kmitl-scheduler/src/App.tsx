@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { ThemeProvider } from 'contexts/ThemeContext'
 import { StoreProvider } from 'contexts/StoreContext'
 import { DialogProvider } from 'contexts/DialogContext'
+import { reducer, State, Action, initialState } from 'reducers/course'
 import { GlobalDialog } from 'components/Dialog/GlobalDialog'
 import { Home } from 'pages/home'
 import { NotFound } from 'pages/404'
@@ -32,7 +33,7 @@ const Router: React.FC = () => {
 export const App: React.FC = () => {
   return (
     <ThemeProvider>
-      <StoreProvider>
+      <StoreProvider reducer={reducer} initialState={initialState}>
         <DialogProvider>
           <CssBaseline />
           <AppWrapper>

@@ -6,7 +6,7 @@ import { useStore, useDialog } from 'hooks/useStore'
 import { Block } from 'components/Block'
 import { BlockDetailDialog } from 'components/Dialog/BlockDetailDialog'
 import { isCoordsInDropBoundaries } from 'utils/dropzone'
-import { CourseWithSection, DomRect } from 'types'
+import { CourseId, CourseType, DomRect } from 'types'
 
 const Root = styled(Paper)(() => ({
   gap: 16,
@@ -21,14 +21,14 @@ const Root = styled(Paper)(() => ({
 
 interface IDropZone {
   color: string
-  courses?: CourseWithSection[]
   dropZonesDomRects: DomRect | null
   setDropZonesDomRects: (dropZonesDomRects: DomRect) => void
+  courseType: CourseType
 }
 
-export const DropZone: React.FC<IDropZone> = ({ color, courses = [], dropZonesDomRects, setDropZonesDomRects }) => {
+export const DropZone = ({ color, dropZonesDomRects, setDropZonesDomRects, courseType }: IDropZone) => {
   const { open } = useDialog()
-  const { freeCourses, selectedCourses, setFreeCourses, setSelectedCourses } = useStore()
+  const { allCourses, deleteCourse, selectedCourses } = useStore()
 
   const zoneRef = useRef<HTMLDivElement | null>(null)
 
@@ -48,34 +48,30 @@ export const DropZone: React.FC<IDropZone> = ({ color, courses = [], dropZonesDo
 
     window.addEventListener('resize', resizeHandler)
     return () => window.removeEventListener('resize', resizeHandler)
-  }, [zoneRef, freeCourses, selectedCourses])
+  }, [zoneRef, selectedCourses])
 
   const isCoordsInBox = ({ point }: PanInfo): boolean => {
     if (!dropZonesDomRects) return true
     return isCoordsInDropBoundaries(point, dropZonesDomRects)
   }
 
-  const handleOnDragEnd = (courseWithSection: CourseWithSection, { point }: PanInfo) => {
+  const handleOnDragEnd = (courseId: CourseId, { point }: PanInfo) => {
     if (!dropZonesDomRects) return
     if (!isCoordsInDropBoundaries(point, dropZonesDomRects)) {
-      const leftedBlocks = selectedCourses.filter(
-        (selectedCourse) => selectedCourse.course.id !== courseWithSection.course.id,
-      )
-      setSelectedCourses([...leftedBlocks])
-      setFreeCourses((prev) => [...prev, courseWithSection])
+      deleteCourse(courseId)
     }
   }
 
   return (
     <Root ref={zoneRef}>
-      {courses.map((courseWithSection, idx) => (
+      {selectedCourses[courseType].map((courseId) => (
         <Block
-          key={`DropZone-${courseWithSection.course.id}-${idx}`}
+          key={`DropZone-${courseId}`}
           color={color}
-          label={courseWithSection.course.name}
+          label={allCourses[courseId].name}
           isCoordsInBox={isCoordsInBox}
-          onDoubleClick={() => open(<BlockDetailDialog courseId={courseWithSection.course.id} from="dropzone" />)}
-          onDragEnd={(_, info) => handleOnDragEnd(courseWithSection, info)}
+          onDoubleClick={() => open(<BlockDetailDialog courseId={courseId} courseType={courseType} />)}
+          onDragEnd={(_, info) => handleOnDragEnd(courseId, info)}
         />
       ))}
     </Root>

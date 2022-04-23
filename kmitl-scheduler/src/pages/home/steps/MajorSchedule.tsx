@@ -1,76 +1,32 @@
 import { useState, useCallback, useMemo } from 'react'
 import { Stack } from '@mui/material'
-import { flattenDeep, compact } from 'lodash'
-import moment from 'moment'
 import { Eventcalendar as EventCalendar, toast, localeTh } from '@mobiscroll/react'
 
 import { DragZone } from 'components/Dragzone'
 import { DropZone } from 'components/Dropzone'
+import SearchBar from 'components/SearchBar'
 
 import { useStore } from 'hooks/useStore'
 
-import { DomRect, EventToCalendar } from 'types'
-import SearchBar from 'components/SearchBar'
-import { isDateRange } from 'types/guard'
+import { CourseType, DomRect } from 'types'
+import { getAllSchedules } from 'utils/course'
 
 export const MajorSchedule = () => {
-  const { freeCourses, selectedCourses } = useStore()
+  const { allCourses, selectedCourses, sectionMapping } = useStore()
 
   const [dropZonesDomRects, setDropZonesDomRects] = useState<DomRect | null>(null)
 
   const onEventClick = useCallback((event) => toast({ message: event.event.title }), [])
 
-  const allSchedule = useMemo(
-    () =>
-      flattenDeep(
-        selectedCourses
-          .filter(({ course }) => !!course.section.length)
-          .map<Array<Array<EventToCalendar> | EventToCalendar>>(({ course, sectionPractice, sectionTheory }) =>
-            compact([
-              sectionPractice?.schedule.map<EventToCalendar>(({ start, end }) => ({
-                title: course.name,
-                start: moment.unix(start),
-                end: moment.unix(end),
-                color: '#f107a3',
-              })) ?? null,
-              sectionTheory?.schedule.map<EventToCalendar>(({ start, end }) => ({
-                title: course.name,
-                start: moment.unix(start),
-                end: moment.unix(end),
-                color: '#f107a3',
-              })) ?? null,
-              isDateRange(course.midterm)
-                ? {
-                    title: course.name,
-                    start: moment.unix(course.midterm.start),
-                    end: moment.unix(course.midterm.end),
-                    color: '#f1b307',
-                  }
-                : null,
-              isDateRange(course.final)
-                ? {
-                    title: course.name,
-                    start: moment.unix(course.final.start),
-                    end: moment.unix(course.final.end),
-                    color: '#f93201',
-                  }
-                : null,
-            ]),
-          ),
-      ),
-    [selectedCourses],
-  )
-
-  // * Enable this to log `allSchedule`
-  // useEffect(() => console.log('allSchedule', allSchedule), [allSchedule])
+  const allSchedule = useMemo(() => getAllSchedules(allCourses, selectedCourses, sectionMapping), [selectedCourses])
 
   return (
     <Stack gap={2}>
       <SearchBar />
-      <DragZone color="#f107a3" courses={freeCourses} dropZonesDomRects={dropZonesDomRects} />
+      <DragZone color="#f107a3" courseType={CourseType.Main} dropZonesDomRects={dropZonesDomRects} />
       <DropZone
         color="#7b2ff7"
-        courses={selectedCourses}
+        courseType={CourseType.Main}
         dropZonesDomRects={dropZonesDomRects}
         setDropZonesDomRects={(dropZonesDomRects: DomRect) => setDropZonesDomRects(dropZonesDomRects)}
       />
