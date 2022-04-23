@@ -7,9 +7,9 @@ export enum SectionType {
   Practice = 'ปฏิบัติ',
 }
 
-export type CourseType = 'department' | 'language' | 'human' | 'social' | 'sciMath' | 'free'
+export type CourseCategory = 'department' | 'language' | 'human' | 'social' | 'sciMath' | 'free'
 
-export type Credit = Partial<{ [courseType in CourseType]: number }>
+export type Credit = Partial<{ [courseCategory in CourseCategory]: number }>
 
 export type DateRange = {
   start: number
@@ -28,7 +28,7 @@ export type Course = {
   id: string
   name: string
   class_year: ClassYear
-  course_type: CourseType
+  course_type: CourseCategory
   credit: string
   midterm?: string | DateRange
   final?: string | DateRange
@@ -43,7 +43,7 @@ export type Course = {
 export type Subject = {
   id: string
   name: string
-  course_type: CourseType
+  course_type: CourseCategory
 }
 
 export interface TranscriptData {
@@ -77,9 +77,19 @@ export type EventToCalendar = {
   end: Moment
   color: string
 }
+export type CourseId = Course['id']
+export type CourseField = Omit<Course, 'id'>
+export type CourseTables = Record<CourseId, CourseField>
 
-export type CourseWithSection = {
-  course: Course
-  sectionTheory?: Section
-  sectionPractice?: Section
+export enum CourseType {
+  Main = 'main',
+  Option = 'option',
 }
+
+export type SectionMapping = Record<
+  CourseId,
+  {
+    sectionTheory?: Section
+    sectionPractice?: Section
+  }
+>

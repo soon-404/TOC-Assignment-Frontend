@@ -109,7 +109,7 @@ type KeyOfBlockDetailPickOut = keyof BlockDetailPickOut
 type CopyableKey = Extract<KeyOfBlockDetailPickOut, 'id' | 'name'>
 
 interface BlockDetailDialogProps {
-  courseId: Course['id']
+  courseId: CourseId
   from: 'dragzone' | 'dropzone'
 }
 

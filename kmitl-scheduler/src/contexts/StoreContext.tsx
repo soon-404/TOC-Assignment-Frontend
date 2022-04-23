@@ -1,4 +1,4 @@
-import { createContext, ReactNode, Dispatch, useState, SetStateAction, FC, useEffect } from 'react'
+import { createContext, ReactNode, Dispatch, useState, SetStateAction, FC, useEffect, useReducer } from 'react'
 import { Course, CourseWithSection, ClassYear, ApiTablesData, SectionType } from 'types'
 
 import { httpClient } from 'api/httpClient'
@@ -16,13 +16,40 @@ interface IStoreContext {
   allCourseErrorMsg: string | false
 }
 
+type State = {
+  data?: HNResponse
+  isLoading: boolean
+  error?: string
+}
+
+type HNResponse = {
+  hits: {
+    title: string
+    objectID: string
+    url: string
+  }[]
+}
+
+type Action = { type: 'request' } | { type: 'success'; results: HNResponse } | { type: 'failure'; error: string }
+
+const reducer = (state: State, action: Action): State => {
+  switch (action.type) {
+    case 'request':
+      return { isLoading: true }
+    case 'success':
+      return { isLoading: false, data: action.results }
+    case 'failure':
+      return { isLoading: false, error: action.error }
+  }
+}
+
 interface StoreProviderProps {
   children: ReactNode
 }
 
 export const StoreContext = createContext<IStoreContext>({} as IStoreContext)
 
-export const StoreProvider: FC<StoreProviderProps> = ({ children }) => {
+export const StoreProvider: FC<StoreProviderProps> = ({ children, reducer }) => {
   const [activeStep, setActiveStep] = useState<number>(0)
   const [classYear, setClassYear] = useState<ClassYear | null>('2') // TODO : set default `null`
 
@@ -32,6 +59,8 @@ export const StoreProvider: FC<StoreProviderProps> = ({ children }) => {
 
   const [isAllCourseLoading, setIsAllCourseLoading] = useState<boolean>(false)
   const [allCourseErrorMsg, setAllCourseErrorMsg] = useState<string | false>(false)
+
+  const [state, dispatch] = useReducer(reducer, { isLoading: false })
 
   // * Enable this to log `allCourses`
   // useEffect(() => console.log('all courses', allCourses), [allCourses])
