@@ -33,10 +33,6 @@ export const StoreProvider: FC<StoreProviderProps> = ({ children, reducer, initi
     dispatch({ type: ActionType.SetSection, courseId, section, sectionType })
 
   useEffect(() => {
-    console.log('x', state.unselectedCourses.main, state.selectedCourses.main)
-  }, [state])
-
-  useEffect(() => {
     const fetchTables = async () => {
       const {
         data: { data: _courses, success },

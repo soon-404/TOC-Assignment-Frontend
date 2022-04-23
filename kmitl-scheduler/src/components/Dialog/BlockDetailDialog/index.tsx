@@ -113,7 +113,7 @@ export const BlockDetailDialog = ({ courseId, courseType }: BlockDetailDialogPro
   const { allCourses, addCourse, deleteCourse, selectedCourses } = useStore()
   const { class_year, name, course_type, credit, midterm, final, teacher } = allCourses[courseId]
 
-  const isSelected = useMemo(() => isCourseSelected(courseId, selectedCourses[courseType]), [])
+  const isSelected = useMemo(() => isCourseSelected(courseId, selectedCourses[courseType]), [selectedCourses])
 
   return (
     <Box>
