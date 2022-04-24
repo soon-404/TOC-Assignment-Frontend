@@ -1,12 +1,13 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { Paper, styled } from '@mui/material'
 import { PanInfo } from 'framer-motion'
 
-import { useStore, useDialog } from 'hooks/useStore'
+import { useStore, useDialog, useSearch } from 'hooks/useStore'
 import { Block } from 'components/Block'
 import { BlockDetailDialog } from 'components/Dialog/BlockDetailDialog'
 import { isCoordsInDropBoundaries } from 'utils/dropzone'
 import { CourseId, CourseType, DomRect } from 'types'
+import { flatten } from 'lodash'
 
 const Root = styled(Paper)(() => ({
   gap: 16,
@@ -28,9 +29,12 @@ interface IDropZone {
 
 export const DropZone = ({ color, dropZonesDomRects, setDropZonesDomRects, courseType }: IDropZone) => {
   const { open } = useDialog()
-  const { allCourses, deleteCourse, selectedCourses } = useStore()
+  const { allCourses, deleteCourse, selectedCourses, unselectedCourses, externalUnselectedCourses } = useStore()
+  const { keyword } = useSearch()
 
   const zoneRef = useRef<HTMLDivElement | null>(null)
+
+  const aggregateSelectedCourses = useMemo(() => flatten(Object.values(selectedCourses)), [selectedCourses])
 
   useEffect(() => {
     const resizeHandler = () => {
@@ -48,7 +52,7 @@ export const DropZone = ({ color, dropZonesDomRects, setDropZonesDomRects, cours
 
     window.addEventListener('resize', resizeHandler)
     return () => window.removeEventListener('resize', resizeHandler)
-  }, [zoneRef, selectedCourses])
+  }, [zoneRef, selectedCourses, unselectedCourses, externalUnselectedCourses, keyword])
 
   const isCoordsInBox = ({ point }: PanInfo): boolean => {
     if (!dropZonesDomRects) return true
@@ -64,7 +68,7 @@ export const DropZone = ({ color, dropZonesDomRects, setDropZonesDomRects, cours
 
   return (
     <Root ref={zoneRef}>
-      {selectedCourses[courseType].map((courseId) => (
+      {aggregateSelectedCourses.map((courseId) => (
         <Block
           key={`DropZone-${courseId}`}
           color={color}

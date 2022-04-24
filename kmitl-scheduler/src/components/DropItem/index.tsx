@@ -1,9 +1,7 @@
-import { Box, Input, Paper, styled, Typography } from '@mui/material'
-import FormData from 'form-data'
+import { Box, Button, Input, Paper, styled, Typography } from '@mui/material'
 import React, { useState, useCallback } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { useStore } from 'hooks/useStore'
-import { httpClient } from 'api/httpClient'
 
 const Root = styled(Paper)(() => ({
   height: 400,
@@ -27,8 +25,27 @@ const ContentContainer = styled(Box)(() => ({
   height: '100%',
 }))
 
-export const DropItem = () => {
-  const [files, setFiles] = useState<File[]>([])
+const StyledButton = styled(Button)(() => ({
+  textTransform: 'none',
+  borderRadius: 10,
+  border: '2px #c3c3c37e solid',
+  backgroundColor: '#f7f7f74f',
+  color: 'white',
+  padding: '8px 24px',
+  fontSize: '3rem',
+  '&:hover, &:focus': {
+    backgroundColor: '#c3c3c39b',
+    border: '2px #c3c3c39b solid',
+  },
+}))
+
+type DropItemProps = {
+  files: File[]
+  setFiles: (file: File[]) => void
+  handleSendTranscript: () => Promise<void>
+}
+
+export const DropItem = ({ files, setFiles, handleSendTranscript }: DropItemProps) => {
   const [isError, setIsError] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
 
@@ -46,27 +63,18 @@ export const DropItem = () => {
     if (file.size / 1024 / 1024 <= 15) {
       setIsError(false)
       setErrorMsg('')
-      setFiles((files) => [...files, file])
+      setFiles([...files, file])
     } else {
       setIsError(true)
       setErrorMsg('Cannot upload image with size more than 15 MB.')
     }
   }
 
-  // TODO : use this
-  const sendTranscript = async () => {
-    const formData = new FormData()
-    formData.append('file', files[0])
-
-    const { data } = await httpClient.post('/uploader', formData, { headers: formData.getHeaders() })
-    console.log('x', data)
-  }
-
   const onDrop = useCallback((acceptedFiles) => {
     if (acceptedFiles[0].size / 1024 / 1024 <= 15) {
       setIsError(false)
       setErrorMsg('')
-      setFiles((files) => [...files, acceptedFiles[0]])
+      setFiles([...files, acceptedFiles[0]])
     } else {
       setIsError(true)
       setErrorMsg('Cannot upload image with size more than 15 MB.')
@@ -77,24 +85,28 @@ export const DropItem = () => {
 
   return (
     <Root>
-      <DropzoneBox {...getRootProps()}>
-        <Input
-          type="file"
-          id="file"
-          className="input-file"
-          onChange={handleOnChange}
-          {...getInputProps()}
-          // * Fixed `getInputProps` bug //
-          /**/ color={undefined} /**/
-          /**/ size={undefined} /**/
-          // *************************** //
-        />
-        <ContentContainer>
-          <Typography variant="h3" color="#ffffff" align="center">
-            upload transcript plz
-          </Typography>
-        </ContentContainer>
-      </DropzoneBox>
+      {files.length === 0 ? (
+        <DropzoneBox {...getRootProps()}>
+          <Input
+            type="file"
+            id="file"
+            className="input-file"
+            onChange={handleOnChange}
+            {...getInputProps()}
+            // * Fixed `getInputProps` bug //
+            /**/ color={undefined} /**/
+            /**/ size={undefined} /**/
+            // *************************** //
+          />
+          <ContentContainer>
+            <Typography variant="h3" color="#ffffff" align="center">
+              upload transcript plz
+            </Typography>
+          </ContentContainer>
+        </DropzoneBox>
+      ) : (
+        <StyledButton onClick={async () => await handleSendTranscript()}>Send Transcript</StyledButton>
+      )}
     </Root>
   )
 }

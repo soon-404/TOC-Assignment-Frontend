@@ -1,15 +1,32 @@
 import { Moment } from 'moment'
+import { mainCourseCategory, optionCourseCategory } from 'constants'
 
-export type ClassYear = '1' | '2' | '3' | '4'
+export * from 'types/guard'
 
 export enum SectionType {
   Theory = 'ทฤษฎี',
   Practice = 'ปฏิบัติ',
 }
 
-export type CourseCategory = 'department' | 'specific_department' | 'language' | 'human' | 'social' | 'sciMath' | 'free'
+export enum CourseType {
+  Main = 'main',
+  Option = 'option',
+}
+
+export type ClassYear = '1' | '2' | '3' | '4'
+
+export type MainCourseCategory = typeof mainCourseCategory[number]
+export type OptionCourseCategory = typeof optionCourseCategory[number]
+export type CourseCategory = MainCourseCategory | OptionCourseCategory
+
+export type MainCourseCategoryFilter = Record<MainCourseCategory, boolean>
+export type OptionCourseCategoryFilter = Record<OptionCourseCategory, boolean>
+export type CourseCategoryFilter = Record<CourseCategory, boolean>
 
 export type Credit = Partial<{ [courseCategory in CourseCategory]: number }>
+export type RequiredCredit = Required<Credit>
+
+export type SortField = 'id' | 'name' | 'class_year' | 'course_type'
 
 export type DateRange = {
   start: number
@@ -81,11 +98,6 @@ export type EventToCalendar = {
 export type CourseId = Course['id']
 export type CourseField = Omit<Course, 'id'>
 export type CourseTables = Record<CourseId, CourseField>
-
-export enum CourseType {
-  Main = 'main',
-  Option = 'option',
-}
 
 export type SectionMapping = Record<CourseId, Partial<Record<SectionType, Section>>>
 

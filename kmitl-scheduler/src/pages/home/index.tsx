@@ -7,7 +7,7 @@ import { StepCard } from 'components/StepperCard'
 
 import { UploadTranscript } from 'pages/home/steps/UploadTranscript'
 import { MajorSchedule } from 'pages/home/steps/MajorSchedule'
-import { MinorSchedule } from 'pages/home/steps/MinorScheDule'
+import { MinorSchedule } from 'pages/home/steps/MinorSchedule'
 import { Conclude } from 'pages/home/steps/Conclude'
 
 const HomeContainer = styled(Container)(() => ({

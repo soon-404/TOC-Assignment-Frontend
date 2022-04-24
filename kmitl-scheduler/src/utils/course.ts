@@ -1,10 +1,23 @@
 import { flattenDeep, compact } from 'lodash'
 import moment from 'moment'
-import { Course, CourseField, CourseId, CourseTables, CourseType, EventToCalendar, SectionMapping } from 'types'
-import { isDateRange } from 'types/guard'
+import { mainCourseCategory } from 'constants'
+import {
+  Course,
+  CourseCategoryFilter,
+  CourseField,
+  CourseId,
+  CourseTables,
+  CourseType,
+  EventToCalendar,
+  SectionMapping,
+  isDateRange,
+  CourseCategory,
+} from 'types'
 
-export const isMainCourse = (course: Course | CourseField): boolean =>
-  ['department', 'specific_department'].includes(course.course_type)
+export const isMainCourse = (course: Course | CourseField | string): boolean => {
+  if (typeof course === 'string') return (mainCourseCategory as string[]).includes(course)
+  return (mainCourseCategory as CourseCategory[]).includes(course.course_type)
+}
 
 export const getCourseType = (course: Course | CourseField): CourseType =>
   isMainCourse(course) ? CourseType.Main : CourseType.Option
@@ -12,15 +25,8 @@ export const getCourseType = (course: Course | CourseField): CourseType =>
 export const isCourseSelected = (courseId: CourseId, selectedCourses: CourseId[]): boolean =>
   !!selectedCourses.find((_courseId) => _courseId === courseId)
 
-export const isValidToAdd = (
-  courseId: CourseId,
-  unselectedCourses: CourseId[],
-  selectedCourses: CourseId[],
-): boolean => {
-  return (
-    !!unselectedCourses.find((_courseId) => _courseId === courseId) &&
-    !selectedCourses.find((_courseId) => _courseId === courseId)
-  )
+export const isValidToAdd = (courseId: CourseId, selectedCourses: CourseId[]): boolean => {
+  return !selectedCourses.find((_courseId) => _courseId === courseId)
 }
 
 export const isValidToDelete = (
@@ -154,3 +160,16 @@ export const getFinalSchedules = (
       ),
     ),
   )
+
+export const filterByCoursesCategory = (
+  coursesId: CourseId[],
+  allCourses: CourseTables,
+  courseCategory: CourseCategoryFilter,
+): CourseId[] => {
+  const bools = Object.values(courseCategory)
+  if (!bools.some((bool) => bool) || bools.every((bool) => bool)) {
+    return coursesId
+  }
+
+  return coursesId.filter((courseId) => !!allCourses?.[courseId] && courseCategory[allCourses[courseId].course_type])
+}

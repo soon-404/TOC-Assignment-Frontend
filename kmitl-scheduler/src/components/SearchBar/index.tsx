@@ -1,23 +1,28 @@
-import React, { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, ChangeEvent, MouseEvent, useMemo, ElementType } from 'react'
 import {
   alpha,
   Box,
+  Button,
+  Checkbox,
   FormControl,
+  FormControlLabel,
+  FormGroup,
   InputBase,
   InputLabel,
   MenuItem,
   Popover,
   Select,
   SelectChangeEvent,
+  SelectProps,
   Stack,
   styled,
   Typography,
-  Checkbox,
-  FormControlLabel,
-  Button,
 } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search'
-import { makeStyles } from '@mui/styles'
+import { useSearch } from 'hooks/useStore'
+import { useSearchGroup } from 'hooks/useSearchGroup'
+import { CourseType, SortField } from 'types'
+import { isMainCourse } from 'utils/course'
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -44,6 +49,12 @@ const SearchIconWrapper = styled('div')(({ theme }) => ({
   justifyContent: 'center',
 }))
 
+const StyledSelect = styled((props: SelectProps<SortField>) => (
+  <Select {...props} MenuProps={{ PaperProps: { sx: { backgroundColor: 'white', border: '1px solid black' } } }} />
+))(() => ({
+  backgroundColor: 'white',
+}))
+
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
   color: 'inherit',
   width: '100%',
@@ -56,28 +67,52 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }))
 
-const useStyles = makeStyles({
-  menu: {
-    '& .MuiPaper-root': {
-      backgroundColor: 'white',
-    },
-  },
-})
+type SearchBarProps = {
+  courseType: CourseType
+}
 
-interface SearchBarProps {}
+const sortBy: Record<SortField, string> = {
+  class_year: 'class year',
+  course_type: 'course category',
+  id: 'id',
+  name: 'name',
+}
 
-const SearchBar: React.FC<SearchBarProps> = () => {
-  const classes = useStyles()
+const SearchBar = ({ courseType }: SearchBarProps) => {
+  const { handleSearch, setKeyword: setGlobalKeyword, keyword: globalKeyword } = useSearch()
+
+  const {
+    filterCategory: _filterCategory,
+    keyword,
+    sortField,
+    setFilterCategory,
+    setKeyword,
+    setSortField,
+  } = useSearchGroup(globalKeyword)
+
+  const filterCategory = useMemo(
+    () =>
+      Object.fromEntries(
+        Object.entries(_filterCategory).filter(([key, _]) => (courseType === CourseType.Main) === isMainCourse(key)),
+      ),
+    [_filterCategory],
+  )
+
   const [isFocus, setIsFocus] = useState(false)
-  const [sortByValue, setSortByValue] = useState<'1' | '2' | '3'>('1')
   const [popoverEl, setPopoverEl] = useState<HTMLDivElement | null>(null)
   const inputRef = useRef<HTMLInputElement | null>(null)
 
-  const handleSortChange = (event: SelectChangeEvent) => {
-    setSortByValue(event.target.value as any) // Interface later
+  useEffect(() => {
+    if (keyword === '') setGlobalKeyword(keyword)
+  }, [keyword])
+
+  const handleKeywordChange = (e: ChangeEvent<HTMLInputElement>) => setKeyword(e.target.value)
+
+  const handleChangeSortField = (event: SelectChangeEvent<SortField>) => {
+    setSortField(event.target.value as SortField)
   }
 
-  const handleSearching = (event: React.MouseEvent<HTMLDivElement>) => {
+  const handleClickInput = (event: MouseEvent<HTMLDivElement>) => {
     setIsFocus(true)
     setPopoverEl(event.currentTarget)
   }
@@ -97,69 +132,78 @@ const SearchBar: React.FC<SearchBarProps> = () => {
 
   return (
     <Box>
-      <Search>
+      <Search onChange={handleKeywordChange}>
         <SearchIconWrapper>
           <SearchIcon />
         </SearchIconWrapper>
         <StyledInputBase
           ref={inputRef}
-          onClick={handleSearching}
+          onClick={handleClickInput}
           onBlur={handlePopoverClose}
+          value={keyword}
           placeholder="Search…"
           inputProps={{ 'aria-label': 'search' }}
         />
-        <Popover
-          id="search-popover"
-          disableAutoFocus
-          open={isFocus}
-          anchorEl={popoverEl}
-          onClose={handlePopoverClose}
-          anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'right',
-          }}
-          transformOrigin={{
-            vertical: 'top',
-            horizontal: 'right',
-          }}
-          PaperProps={{
-            style: {
-              maxHeight: '50vh',
-              width: '100%',
-              backgroundColor: 'white',
-            },
-          }}
-          sx={{ maxWidth: '1000px' }}
-        >
-          <Stack spacing={4}>
-            <Typography variant="h6">เรียงจาก</Typography>
-            <FormControl>
-              <InputLabel id="sort-by-label">เรียงจาก</InputLabel>
-              <Select
-                className={classes.menu}
-                labelId="sort-by-label"
-                value={sortByValue}
-                label="เรียงจาก"
-                onChange={handleSortChange}
-              >
-                <MenuItem value={'1'}>Ten</MenuItem>
-                <MenuItem value={'2'}>Twenty</MenuItem>
-                <MenuItem value={'3'}>Thirty</MenuItem>
-              </Select>
-            </FormControl>
-            <Typography variant="h6">กรองจาก</Typography>
-            <Stack direction="row" alignItems="center" flexWrap="wrap">
-              <FormControlLabel control={<Checkbox defaultChecked />} label="Label" />
-              <FormControlLabel control={<Checkbox />} label="Disabled" />
-            </Stack>
-            <Stack direction="row" justifyContent="flex-end" alignItems="center">
-              <Button variant="contained" endIcon={<SearchIcon />}>
-                ค้นหา
-              </Button>
-            </Stack>
-          </Stack>
-        </Popover>
       </Search>
+      <Popover
+        id="search-popover"
+        disableAutoFocus
+        open={isFocus}
+        anchorEl={popoverEl}
+        onClose={handlePopoverClose}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+        PaperProps={{
+          style: {
+            maxHeight: '50vh',
+            width: '100%',
+            backgroundColor: 'white',
+          },
+        }}
+        sx={{ maxWidth: '1000px' }}
+      >
+        <Stack spacing={4}>
+          <Typography variant="h6">Sort By</Typography>
+          <FormControl>
+            <InputLabel id="sort-by-label">Sort By</InputLabel>
+            <StyledSelect labelId="sort-by-label" label="Sort By" value={sortField} onChange={handleChangeSortField}>
+              {Object.keys(sortBy).map((key) => (
+                <MenuItem key={key} value={key}>
+                  {sortBy[key as SortField]}
+                </MenuItem>
+              ))}
+            </StyledSelect>
+          </FormControl>
+          <FormGroup>
+            <Stack direction="row" alignItems="center" flexWrap="wrap">
+              {Object.keys(filterCategory).map((category: string) => (
+                <FormControlLabel
+                  key={`category-${category}-${courseType}`}
+                  control={<Checkbox />}
+                  label={category}
+                  checked={filterCategory[category]}
+                  onChange={() => setFilterCategory((prev) => ({ ...prev, [category]: !prev[category as never] }))}
+                />
+              ))}
+            </Stack>
+          </FormGroup>
+          <Stack direction="row" justifyContent="flex-end" alignItems="center">
+            <Button
+              variant="contained"
+              endIcon={<SearchIcon />}
+              onClick={async () => await handleSearch(keyword, _filterCategory, sortField)}
+            >
+              ค้นหา
+            </Button>
+          </Stack>
+        </Stack>
+      </Popover>
     </Box>
   )
 }

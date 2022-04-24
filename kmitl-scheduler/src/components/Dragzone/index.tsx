@@ -2,9 +2,11 @@ import { PanInfo } from 'framer-motion'
 import { styled, Paper } from '@mui/material'
 import { Block } from 'components/Block'
 import { BlockDetailDialog } from 'components/Dialog/BlockDetailDialog'
-import { useDialog, useStore } from 'hooks/useStore'
+import { useDialog, useSearch, useStore } from 'hooks/useStore'
 import { isCoordsInDropBoundaries } from 'utils/dropzone'
 import { CourseId, CourseType, DomRect } from 'types'
+import { useMemo } from 'react'
+import { filterByCoursesCategory } from 'utils/course'
 
 const Root = styled(Paper)(() => ({
   gap: 16,
@@ -25,16 +27,35 @@ interface DragZoneProps {
 
 export const DragZone = ({ color, courseType, dropZonesDomRects }: DragZoneProps) => {
   const { open } = useDialog()
-  const { allCourses, addCourse, unselectedCourses } = useStore()
+  const { allCourses, addCourse, unselectedCourses, externalUnselectedCourses } = useStore()
+  const { filterCategory, keyword } = useSearch()
 
   const handleOnDragEnd = (courseId: CourseId, { point }: PanInfo) => {
     if (!dropZonesDomRects) return
-    if (isCoordsInDropBoundaries(point, dropZonesDomRects)) addCourse(courseId)
+
+    // * for log
+    // console.log('DropZone')
+    // console.table(dropZonesDomRects)
+    // console.log('DragEnd', 'x =', point.x, 'y =', point.y)
+
+    if (isCoordsInDropBoundaries(point, dropZonesDomRects)) {
+      addCourse(courseId)
+    }
   }
+
+  const filteredCourses: CourseId[] = useMemo(
+    () =>
+      filterByCoursesCategory(
+        keyword === '' ? unselectedCourses[courseType] : externalUnselectedCourses[courseType],
+        allCourses,
+        filterCategory,
+      ),
+    [unselectedCourses, courseType, allCourses, filterCategory, keyword],
+  )
 
   return (
     <Root>
-      {unselectedCourses[courseType].map((courseId) => (
+      {filteredCourses.map((courseId) => (
         <Block
           key={`DragZone-${courseId}`}
           color={color}
