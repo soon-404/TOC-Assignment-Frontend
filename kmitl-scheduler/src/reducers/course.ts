@@ -1,6 +1,6 @@
 import { Reducer } from 'react'
-import { concat, set } from 'lodash'
-import { getCourseType, isValidToAdd, isValidToDelete } from 'utils/course'
+import { cloneDeep, concat, set } from 'lodash'
+import { getCourseType, isMainCourse, isValidToAdd, isValidToDelete } from 'utils/course'
 import {
   Course,
   CourseTables,
@@ -58,43 +58,40 @@ export const reducer: Reducer<State, Action> = (state, action) => {
       const { courseId } = action
       const courseType = getCourseType(state.allCourses[courseId])
       if (isValidToAdd(courseId, state.unselectedCourses[courseType], state.selectedCourses[courseType])) {
-        // TODO : use lodash set
-        return {
-          ...state,
-          unselectedCourses: {
-            ...state.unselectedCourses,
-            [courseType]: state.unselectedCourses[courseType].filter((_courseId) => _courseId !== courseId),
-          },
-          selectedCourses: {
-            ...state.selectedCourses,
-            [courseType]: concat(state.selectedCourses[courseType], courseId),
-          },
-        }
+        const tempState = cloneDeep(state)
+        set(
+          tempState,
+          `unselectedCourses[${courseType}]`,
+          state.unselectedCourses[courseType].filter((_courseId) => _courseId !== courseId),
+        )
+        set(tempState, `selectedCourses[${courseType}]`, concat(state.selectedCourses[courseType], courseId))
+        return tempState
       }
       return state
     }
+
     case ActionType.Delete: {
       const { courseId } = action
       const courseType = getCourseType(state.allCourses[courseId])
       if (isValidToDelete(courseId, state.unselectedCourses[courseType], state.selectedCourses[courseType])) {
-        // TODO : use lodash set
-        return {
-          ...state,
-          unselectedCourses: {
-            ...state.unselectedCourses,
-            [courseType]: concat(state.unselectedCourses[courseType], courseId),
-          },
-          selectedCourses: {
-            ...state.selectedCourses,
-            [courseType]: state.selectedCourses[courseType].filter((_courseId) => _courseId !== courseId),
-          },
-        }
+        const tempState = cloneDeep(state)
+        set(tempState, `unselectedCourses[${courseType}]`, concat(state.unselectedCourses[courseType], courseId))
+        set(
+          tempState,
+          `selectedCourses[${courseType}]`,
+          state.selectedCourses[courseType].filter((_courseId) => _courseId !== courseId),
+        )
+        return tempState
       }
       return state
     }
+
     case ActionType.Init: {
       const allCourses: CourseTables = {}
       const sectionMapping: SectionMapping = {}
+      const suggestMainCourses: CourseId[] = []
+      const suggestOptionCourses: CourseId[] = []
+
       for (const course of action.courses) {
         if (!Object.keys(allCourses).includes(course.id)) {
           allCourses[course.id] = course as CourseField
@@ -102,22 +99,14 @@ export const reducer: Reducer<State, Action> = (state, action) => {
             [SectionType.Practice]: course.section.find((section) => section?.type === SectionType.Practice),
             [SectionType.Theory]: course.section.find((section) => section?.type === SectionType.Theory),
           }
+
+          if (isMainCourse(course)) {
+            suggestMainCourses.push(course.id)
+          } else {
+            suggestOptionCourses.push(course.id)
+          }
         }
       }
-
-      const suggestMainCourses: CourseId[] = Object.keys(allCourses)
-        .filter(
-          (courseId) =>
-            allCourses[courseId].class_year === action.classYear && allCourses[courseId].course_type === 'department',
-        )
-        .map((courseId) => courseId)
-
-      const suggestOptionCourses: CourseId[] = Object.keys(allCourses)
-        .filter(
-          (courseId) =>
-            allCourses[courseId].class_year === action.classYear && allCourses[courseId].course_type !== 'department',
-        )
-        .map((courseId) => courseId)
 
       return {
         ...state,
@@ -126,10 +115,12 @@ export const reducer: Reducer<State, Action> = (state, action) => {
         unselectedCourses: { main: suggestMainCourses, option: suggestOptionCourses },
       }
     }
+
     case ActionType.SetSection: {
       const { courseId, section, sectionType } = action
-      set(state, `sectionMapping[${courseId}][${sectionType}]`, section)
-      return { ...state }
+      const tempState = cloneDeep(state)
+      set(tempState, `sectionMapping[${courseId}][${sectionType}]`, section)
+      return tempState
     }
   }
 }

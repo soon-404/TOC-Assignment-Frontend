@@ -3,8 +3,11 @@ import moment from 'moment'
 import { Course, CourseField, CourseId, CourseTables, CourseType, EventToCalendar, SectionMapping } from 'types'
 import { isDateRange } from 'types/guard'
 
+export const isMainCourse = (course: Course | CourseField): boolean =>
+  ['department', 'specific_department'].includes(course.course_type)
+
 export const getCourseType = (course: Course | CourseField): CourseType =>
-  course.course_type === 'department' ? CourseType.Main : CourseType.Option
+  isMainCourse(course) ? CourseType.Main : CourseType.Option
 
 export const isCourseSelected = (courseId: CourseId, selectedCourses: CourseId[]): boolean =>
   !!selectedCourses.find((_courseId) => _courseId === courseId)

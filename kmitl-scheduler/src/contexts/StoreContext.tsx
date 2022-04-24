@@ -2,6 +2,7 @@ import { createContext, ReactNode, Dispatch, useState, SetStateAction, FC, useEf
 import { httpClient } from 'api/httpClient'
 import { ActionType, State, Action } from 'reducers/course'
 import { ClassYear, ApiTablesData, CourseId, Section, SectionType } from 'types'
+import { courseService } from 'services/course'
 
 interface IStoreContext extends State {
   activeStep: number
@@ -34,19 +35,14 @@ export const StoreProvider: FC<StoreProviderProps> = ({ children, reducer, initi
 
   useEffect(() => {
     const fetchTables = async () => {
-      const {
-        data: { data: _courses, success },
-      } = await httpClient.get<ApiTablesData>('/tables')
-      if (!success) {
-        throw new Error('fetch all courses error')
-      }
-      if (!classYear) {
-        return
-      }
+      if (!classYear) return
+
+      // * Swap this
+      const _courses = await courseService.getAllCourse()
+      // const _courses = await courseService.getCourseByClassYear(classYear)
 
       dispatch({ type: ActionType.Init, courses: _courses, classYear: classYear })
     }
-
     fetchTables()
   }, [classYear])
 

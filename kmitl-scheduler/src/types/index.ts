@@ -7,7 +7,7 @@ export enum SectionType {
   Practice = 'ปฏิบัติ',
 }
 
-export type CourseCategory = 'department' | 'language' | 'human' | 'social' | 'sciMath' | 'free'
+export type CourseCategory = 'department' | 'specific_department' | 'language' | 'human' | 'social' | 'sciMath' | 'free'
 
 export type Credit = Partial<{ [courseCategory in CourseCategory]: number }>
 

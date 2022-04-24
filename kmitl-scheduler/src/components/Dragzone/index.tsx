@@ -29,11 +29,7 @@ export const DragZone = ({ color, courseType, dropZonesDomRects }: DragZoneProps
 
   const handleOnDragEnd = (courseId: CourseId, { point }: PanInfo) => {
     if (!dropZonesDomRects) return
-    if (isCoordsInDropBoundaries(point, dropZonesDomRects)) {
-      console.log('courseId', courseId)
-
-      addCourse(courseId)
-    }
+    if (isCoordsInDropBoundaries(point, dropZonesDomRects)) addCourse(courseId)
   }
 
   return (
