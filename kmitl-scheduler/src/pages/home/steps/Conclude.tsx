@@ -1,12 +1,28 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useMemo } from 'react'
 import { saveAs } from 'file-saver'
 import { Box, Stack, styled, Button, Typography } from '@mui/material'
 import { display, positions } from '@mui/system'
 import { Eventcalendar as EventCalendar, toast, localeTh } from '@mobiscroll/react'
 import * as htmlToImage from 'html-to-image'
 import JSZip from 'jszip'
+import { getFinalSchedules, getMidtermSchedules, getStudySchedules } from 'utils/course'
+import { useStore } from 'hooks/useStore'
+
+const ModalWrapper = styled(Box)`
+  min-height: 100vh;
+  width: 100vw;
+  padding: 16px;
+  display: flex;
+  position: fixed;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+  background: linear-gradient(250deg, #7b2ff7, #f107a3);
+`
 
 export const Conclude = () => {
+  const { allCourses, selectedCourses, sectionMapping } = useStore()
+
   // state for table
   const [classTable, setClassTable] = useState('')
   const [midtermTable, setMidtermTable] = useState('')
@@ -16,17 +32,7 @@ export const Conclude = () => {
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   // style for modal box
-  const ModalWrapper = styled(Box)`
-    min-height: 100vh;
-    width: 100vw;
-    padding: 16px;
-    display: flex;
-    position: fixed;
-    justify-content: center;
-    align-items: center;
-    box-sizing: border-box;
-    background: linear-gradient(250deg, #7b2ff7, #f107a3);
-  `
+
   // when isModalOpen, classTable, midtermTable change trigger this
   useEffect(() => {
     if (classTable != '' && midtermTable != '' && finalTable != '' && isModalOpen == true) {
@@ -94,6 +100,10 @@ export const Conclude = () => {
     setFinalTable('')
   }
 
+  const studySchedule = useMemo(() => getStudySchedules(allCourses, selectedCourses, sectionMapping), [selectedCourses])
+  const midtermSchedule = useMemo(() => getMidtermSchedules(allCourses, selectedCourses), [selectedCourses])
+  const finalSchedule = useMemo(() => getFinalSchedules(allCourses, selectedCourses), [selectedCourses])
+
   return (
     <Box>
       {/* รอ component ปุ่มเลือกแสดงจากหน้า 2, 3 */}
@@ -109,6 +119,7 @@ export const Conclude = () => {
         dragToCreate={false}
         dragToMove={false}
         dragToResize={false}
+        data={midtermSchedule}
         locale={localeTh}
         // TODO : implement data of schedule
         // data={selectedCourses.map((course) => ({

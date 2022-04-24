@@ -74,3 +74,79 @@ export const getAllSchedules = (
       ),
     ),
   )
+
+export const getStudySchedules = (
+  allCourses: CourseTables,
+  selectedCourses: Record<CourseType, CourseId[]>,
+  sectionMapping: SectionMapping,
+) =>
+  compact(
+    flattenDeep(
+      Object.values(selectedCourses).map((coursesId) =>
+        coursesId
+          .filter((courseId) => !!allCourses[courseId].section.length)
+          .map((courseId) =>
+            Object.values(sectionMapping[courseId]).map(
+              (section) =>
+                section?.schedule.map<EventToCalendar>(({ start, end }) => ({
+                  title: allCourses[courseId].name,
+                  start: moment.unix(start),
+                  end: moment.unix(end),
+                  color: '#f107a3',
+                })) ?? null,
+            ),
+          ),
+      ),
+    ),
+  )
+
+export const getMidtermSchedules = (allCourses: CourseTables, selectedCourses: Record<CourseType, CourseId[]>) => {
+  const now = moment()
+  const week = now.get('week')
+  return compact(
+    flattenDeep(
+      Object.values(selectedCourses).map((coursesId) =>
+        coursesId
+          .filter((courseId) => !!allCourses[courseId].section.length)
+          .map((courseId) => {
+            const { midterm, name } = allCourses[courseId]
+            return [
+              isDateRange(midterm)
+                ? {
+                    title: name,
+                    start: moment.unix(midterm.start).set('week', week),
+                    end: moment.unix(midterm.end).set('week', week),
+                    color: '#f1b307',
+                  }
+                : null,
+            ]
+          }),
+      ),
+    ),
+  )
+}
+export const getFinalSchedules = (allCourses: CourseTables, selectedCourses: Record<CourseType, CourseId[]>) => {
+  const now = moment()
+  const week = now.get('week')
+  return compact(
+    flattenDeep(
+      Object.values(selectedCourses).map((coursesId) =>
+        coursesId
+          .filter((courseId) => !!allCourses[courseId].section.length)
+          .map((courseId) => {
+            const { final, name } = allCourses[courseId]
+            return [
+              isDateRange(final)
+                ? {
+                    title: name,
+                    start: moment.unix(final.start).set('week', week),
+                    end: moment.unix(final.end).set('week', week),
+                    color: '#f1b307',
+                  }
+                : null,
+            ]
+          }),
+      ),
+    ),
+  )
+}
