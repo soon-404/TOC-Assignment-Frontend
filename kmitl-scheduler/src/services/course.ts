@@ -32,6 +32,18 @@ class CourseService {
 
     return _courses
   }
+
+  public getCourseByKeyword = async (keyword: string): Promise<Course[]> => {
+    const {
+      data: { data: _courses, success },
+    } = await this._httpClient.get<ApiTablesData>('/tables', { params: { name: keyword, id: keyword } })
+
+    if (!success) {
+      throw new Error(`fetch courses by keyword '${keyword}' error`)
+    }
+
+    return _courses
+  }
 }
 
 export const courseService = new CourseService(httpClient)

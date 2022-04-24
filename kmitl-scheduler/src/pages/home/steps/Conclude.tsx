@@ -1,9 +1,8 @@
-import { useState, useCallback, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { saveAs } from 'file-saver'
-import { Box, Stack, styled, Button, Typography, FormControl, InputLabel, Select, MenuItem } from '@mui/material'
-import { display, positions } from '@mui/system'
+import { Box, styled, Button, Typography } from '@mui/material'
 import { Eventcalendar as EventCalendar, toast, localeTh } from '@mobiscroll/react'
-import * as htmlToImage from 'html-to-image'
+import { toPng } from 'html-to-image'
 import JSZip from 'jszip'
 import { getFinalSchedules, getMidtermSchedules, getStudySchedules } from 'utils/course'
 import { useStore } from 'hooks/useStore'
@@ -35,7 +34,7 @@ export const Conclude = () => {
 
   // data table
   const studySchedule = useMemo(() => getStudySchedules(allCourses, selectedCourses, sectionMapping), [selectedCourses])
-  const midtermSchedule: any = useMemo(() => getMidtermSchedules(allCourses, selectedCourses), [selectedCourses])
+  const midtermSchedule = useMemo(() => getMidtermSchedules(allCourses, selectedCourses), [selectedCourses])
   const finalSchedule = useMemo(() => getFinalSchedules(allCourses, selectedCourses), [selectedCourses])
 
   // when isModalOpen, classTable, midtermTable change trigger this
@@ -51,7 +50,7 @@ export const Conclude = () => {
     if (!portalDiv) {
       throw new Error("The element #portal wasn't found")
     }
-    htmlToImage.toPng(portalDiv).then(function (dataUrl) {
+    toPng(portalDiv).then(function (dataUrl) {
       setClassTable(dataUrl)
     })
 
@@ -59,7 +58,7 @@ export const Conclude = () => {
     if (!portalDiv2) {
       throw new Error("The element #portal wasn't found")
     }
-    htmlToImage.toPng(portalDiv2).then(function (dataUrl2) {
+    toPng(portalDiv2).then(function (dataUrl2) {
       setMidtermTable(dataUrl2)
     })
 
@@ -67,7 +66,7 @@ export const Conclude = () => {
     if (!portalDiv3) {
       throw new Error("The element #portal wasn't found")
     }
-    htmlToImage.toPng(portalDiv3).then(function (dataUrl3) {
+    toPng(portalDiv3).then(function (dataUrl3) {
       setFinalTable(dataUrl3)
     })
   }
@@ -133,9 +132,7 @@ export const Conclude = () => {
   return (
     <Box>
       {/* real data calendar */}
-      <Typography sx={{ marginBottom: 5, color: 'white', fontSize: 35, fontWeight: 800 }}>
-        Class Table
-      </Typography>
+      <Typography sx={{ marginBottom: 5, color: 'white', fontSize: 35, fontWeight: 800 }}>Class Table</Typography>
       <EventCalendar
         theme="ios"
         themeVariant="light"

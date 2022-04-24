@@ -38,7 +38,7 @@ export const getAllSchedules = (
   allCourses: CourseTables,
   selectedCourses: Record<CourseType, CourseId[]>,
   sectionMapping: SectionMapping,
-) =>
+): EventToCalendar[] =>
   compact(
     flattenDeep(
       Object.values(selectedCourses).map((coursesId) =>
@@ -82,7 +82,7 @@ export const getStudySchedules = (
   allCourses: CourseTables,
   selectedCourses: Record<CourseType, CourseId[]>,
   sectionMapping: SectionMapping,
-) =>
+): EventToCalendar[] =>
   compact(
     flattenDeep(
       Object.values(selectedCourses).map((coursesId) =>
@@ -103,7 +103,10 @@ export const getStudySchedules = (
     ),
   )
 
-export const getMidtermSchedules = (allCourses: CourseTables, selectedCourses: Record<CourseType, CourseId[]>) =>
+export const getMidtermSchedules = (
+  allCourses: CourseTables,
+  selectedCourses: Record<CourseType, CourseId[]>,
+): EventToCalendar[] =>
   compact(
     flattenDeep(
       Object.values(selectedCourses).map((coursesId) =>
@@ -126,7 +129,10 @@ export const getMidtermSchedules = (allCourses: CourseTables, selectedCourses: R
     ),
   )
 
-export const getFinalSchedules = (allCourses: CourseTables, selectedCourses: Record<CourseType, CourseId[]>) =>
+export const getFinalSchedules = (
+  allCourses: CourseTables,
+  selectedCourses: Record<CourseType, CourseId[]>,
+): EventToCalendar[] =>
   compact(
     flattenDeep(
       Object.values(selectedCourses).map((coursesId) =>

@@ -1,4 +1,5 @@
-import { createContext, ReactNode, FC, useState, SetStateAction, Dispatch } from 'react'
+import { createContext, ReactNode, FC, useState, useEffect, SetStateAction, Dispatch } from 'react'
+import { courseService } from 'services/course'
 
 interface ISearchContext {
   keyword: string
@@ -13,6 +14,11 @@ export const SearchContext = createContext<ISearchContext>({} as ISearchContext)
 
 export const SearchProvider: FC<SearchProviderProps> = ({ children }) => {
   const [keyword, setKeyword] = useState<string>('')
+
+  const fetchCoursesByKeyword = async () => {
+    if (keyword === '') return
+    const _courses = await courseService.getCourseByKeyword(keyword)
+  }
 
   const value = {
     keyword,
