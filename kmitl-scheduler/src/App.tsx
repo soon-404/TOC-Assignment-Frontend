@@ -1,9 +1,11 @@
+import { FC, ReactNode } from 'react'
 import { Box, CssBaseline, styled } from '@mui/material'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { ThemeProvider } from 'contexts/ThemeContext'
 import { StoreProvider } from 'contexts/StoreContext'
 import { DialogProvider } from 'contexts/DialogContext'
-import { reducer, State, Action, initialState } from 'reducers/course'
+import { SearchProvider } from 'contexts/SearchContext'
+import { reducer, initialState } from 'reducers/course'
 import { GlobalDialog } from 'components/Dialog/GlobalDialog'
 import { Home } from 'pages/home'
 import { NotFound } from 'pages/404'
@@ -19,29 +21,31 @@ const AppWrapper = styled(Box)`
   background: linear-gradient(250deg, #7b2ff7, #f107a3);
 `
 
-const Router: React.FC = () => {
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </BrowserRouter>
-  )
-}
+const Router: FC = () => (
+  <BrowserRouter>
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  </BrowserRouter>
+)
 
-export const App: React.FC = () => {
-  return (
-    <ThemeProvider>
-      <StoreProvider reducer={reducer} initialState={initialState}>
-        <DialogProvider>
-          <CssBaseline />
-          <AppWrapper>
-            <GlobalDialog />
-            <Router />
-          </AppWrapper>
-        </DialogProvider>
-      </StoreProvider>
-    </ThemeProvider>
-  )
-}
+const Provider: FC<{ children: ReactNode }> = ({ children }) => (
+  <ThemeProvider>
+    <StoreProvider reducer={reducer} initialState={initialState}>
+      <SearchProvider>
+        <DialogProvider>{children}</DialogProvider>
+      </SearchProvider>
+    </StoreProvider>
+  </ThemeProvider>
+)
+
+export const App: FC = () => (
+  <Provider>
+    <CssBaseline />
+    <AppWrapper>
+      <GlobalDialog />
+      <Router />
+    </AppWrapper>
+  </Provider>
+)

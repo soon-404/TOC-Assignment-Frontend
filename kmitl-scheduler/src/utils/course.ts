@@ -103,10 +103,8 @@ export const getStudySchedules = (
     ),
   )
 
-export const getMidtermSchedules = (allCourses: CourseTables, selectedCourses: Record<CourseType, CourseId[]>) => {
-  const now = moment()
-  const week = now.get('week')
-  return compact(
+export const getMidtermSchedules = (allCourses: CourseTables, selectedCourses: Record<CourseType, CourseId[]>) =>
+  compact(
     flattenDeep(
       Object.values(selectedCourses).map((coursesId) =>
         coursesId
@@ -117,8 +115,8 @@ export const getMidtermSchedules = (allCourses: CourseTables, selectedCourses: R
               isDateRange(midterm)
                 ? {
                     title: name,
-                    start: moment.unix(midterm.start).set('week', week),
-                    end: moment.unix(midterm.end).set('week', week),
+                    start: moment.unix(midterm.start),
+                    end: moment.unix(midterm.end),
                     color: '#f1b307',
                   }
                 : null,
@@ -127,11 +125,9 @@ export const getMidtermSchedules = (allCourses: CourseTables, selectedCourses: R
       ),
     ),
   )
-}
-export const getFinalSchedules = (allCourses: CourseTables, selectedCourses: Record<CourseType, CourseId[]>) => {
-  const now = moment()
-  const week = now.get('week')
-  return compact(
+
+export const getFinalSchedules = (allCourses: CourseTables, selectedCourses: Record<CourseType, CourseId[]>) =>
+  compact(
     flattenDeep(
       Object.values(selectedCourses).map((coursesId) =>
         coursesId
@@ -142,8 +138,8 @@ export const getFinalSchedules = (allCourses: CourseTables, selectedCourses: Rec
               isDateRange(final)
                 ? {
                     title: name,
-                    start: moment.unix(final.start).set('week', week),
-                    end: moment.unix(final.end).set('week', week),
+                    start: moment.unix(final.start),
+                    end: moment.unix(final.end),
                     color: '#f1b307',
                   }
                 : null,
@@ -152,4 +148,3 @@ export const getFinalSchedules = (allCourses: CourseTables, selectedCourses: Rec
       ),
     ),
   )
-}

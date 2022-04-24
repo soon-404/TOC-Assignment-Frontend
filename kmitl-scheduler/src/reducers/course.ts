@@ -11,6 +11,7 @@ import {
   SectionType,
   Section,
   ClassYear,
+  RecommandedMapping,
 } from 'types'
 
 export enum ActionType {
@@ -25,6 +26,7 @@ export type State = {
   unselectedCourses: Record<CourseType, CourseId[]>
   selectedCourses: Record<CourseType, CourseId[]>
   sectionMapping: SectionMapping
+  isRecommandedMapping: RecommandedMapping
 }
 
 type AddAction = {
@@ -89,12 +91,14 @@ export const reducer: Reducer<State, Action> = (state, action) => {
     case ActionType.Init: {
       const allCourses: CourseTables = {}
       const sectionMapping: SectionMapping = {}
+      const isRecommandedMapping: RecommandedMapping = {}
       const suggestMainCourses: CourseId[] = []
       const suggestOptionCourses: CourseId[] = []
 
       for (const course of action.courses) {
         if (!Object.keys(allCourses).includes(course.id)) {
           allCourses[course.id] = course as CourseField
+          isRecommandedMapping[course.id] = true
           sectionMapping[course.id] = {
             [SectionType.Practice]: course.section.find((section) => section?.type === SectionType.Practice),
             [SectionType.Theory]: course.section.find((section) => section?.type === SectionType.Theory),
@@ -128,6 +132,7 @@ export const reducer: Reducer<State, Action> = (state, action) => {
 export const initialState: State = {
   allCourses: {},
   sectionMapping: {},
+  isRecommandedMapping: {},
   selectedCourses: { main: [], option: [] },
   unselectedCourses: { main: [], option: [] },
 }

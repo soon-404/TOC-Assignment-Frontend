@@ -88,3 +88,5 @@ export enum CourseType {
 }
 
 export type SectionMapping = Record<CourseId, Partial<Record<SectionType, Section>>>
+
+export type RecommandedMapping = Partial<Record<CourseId, boolean>> // <CourseId, isRecommandedCourse>
