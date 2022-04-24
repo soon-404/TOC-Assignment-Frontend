@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect, useMemo } from 'react'
 import { saveAs } from 'file-saver'
-import { Box, Stack, styled, Button, Typography } from '@mui/material'
+import { Box, Stack, styled, Button, Typography, FormControl, InputLabel, Select, MenuItem } from '@mui/material'
 import { display, positions } from '@mui/system'
 import { Eventcalendar as EventCalendar, toast, localeTh } from '@mobiscroll/react'
 import * as htmlToImage from 'html-to-image'
@@ -21,17 +21,22 @@ const ModalWrapper = styled(Box)`
 `
 
 export const Conclude = () => {
+  // store
   const { allCourses, selectedCourses, sectionMapping } = useStore()
 
   // state for table
   const [classTable, setClassTable] = useState('')
   const [midtermTable, setMidtermTable] = useState('')
   const [finalTable, setFinalTable] = useState('')
+  const [test, setTest] = useState('M')
 
   // state for modal
   const [isModalOpen, setIsModalOpen] = useState(false)
 
-  // style for modal box
+  // data table
+  const studySchedule = useMemo(() => getStudySchedules(allCourses, selectedCourses, sectionMapping), [selectedCourses])
+  const midtermSchedule: any = useMemo(() => getMidtermSchedules(allCourses, selectedCourses), [selectedCourses])
+  const finalSchedule = useMemo(() => getFinalSchedules(allCourses, selectedCourses), [selectedCourses])
 
   // when isModalOpen, classTable, midtermTable change trigger this
   useEffect(() => {
@@ -100,18 +105,55 @@ export const Conclude = () => {
     setFinalTable('')
   }
 
-  const studySchedule = useMemo(() => getStudySchedules(allCourses, selectedCourses, sectionMapping), [selectedCourses])
-  const midtermSchedule = useMemo(() => getMidtermSchedules(allCourses, selectedCourses), [selectedCourses])
-  const finalSchedule = useMemo(() => getFinalSchedules(allCourses, selectedCourses), [selectedCourses])
+  // set calendar first subject date show
+  const fixTestDate = (testSchedule: any) => {
+    let dataSort = [...testSchedule]
+    dataSort = dataSort.sort(
+      (a: any, b: any) =>
+        parseInt(a.start.format('YYYY-MM-DD').split('-')[2]) - parseInt(a.start.format('YYYY-MM-DD').split('-')[2]),
+    )
+    const testDate = new Date(
+      parseInt(dataSort[0].start.format('YYYY-MM-DD').split('-')[0]),
+      parseInt(dataSort[0].start.format('YYYY-MM-DD').split('-')[1]) - 1,
+      parseInt(dataSort[0].start.format('YYYY-MM-DD').split('-')[2]),
+    )
+    return testDate
+  }
+
+  const setCalendar = (testSchedule: any) => {
+    if (testSchedule) {
+      if (testSchedule.length > 0) {
+        return fixTestDate(testSchedule)
+      }
+    }
+
+    return []
+  }
 
   return (
     <Box>
-      {/* รอ component ปุ่มเลือกแสดงจากหน้า 2, 3 */}
-      {/* <Box>
-
-      </Box> */}
-
       {/* real data calendar */}
+      <Typography sx={{ marginBottom: 5, color: 'white', fontSize: 35, fontWeight: 800 }}>
+        Class Table
+      </Typography>
+      <EventCalendar
+        theme="ios"
+        themeVariant="light"
+        clickToCreate={false}
+        dragToCreate={false}
+        dragToMove={false}
+        dragToResize={false}
+        data={studySchedule}
+        locale={localeTh}
+        view={{
+          schedule: {
+            type: 'week',
+          },
+        }}
+      />
+      <Typography sx={{ marginTop: 5, marginBottom: 5, color: 'white', fontSize: 35, fontWeight: 800 }}>
+        Midterm Test Table
+      </Typography>
       <EventCalendar
         theme="ios"
         themeVariant="light"
@@ -121,25 +163,36 @@ export const Conclude = () => {
         dragToResize={false}
         data={midtermSchedule}
         locale={localeTh}
-        // TODO : implement data of schedule
-        // data={selectedCourses.map((course) => ({
-        //   id: course.id,
-        //   title: course.name,
-        //   start: '',
-        //   end: '',
-        //   color: '#f107a3',
-        // }))}
+        selectedDate={setCalendar(midtermSchedule)}
         view={{
           schedule: {
-            type: 'week',
+            type: 'month',
           },
         }}
-        // onEventClick={onEventClick}
+      />
+      <Typography sx={{ marginTop: 5, marginBottom: 5, color: 'white', fontSize: 35, fontWeight: 800 }}>
+        Final Test Table
+      </Typography>
+      <EventCalendar
+        theme="ios"
+        themeVariant="light"
+        clickToCreate={false}
+        dragToCreate={false}
+        dragToMove={false}
+        dragToResize={false}
+        data={finalSchedule}
+        locale={localeTh}
+        selectedDate={setCalendar(finalSchedule)}
+        view={{
+          schedule: {
+            type: 'month',
+          },
+        }}
       />
 
       {/* mock up hidden calendar */}
       {isModalOpen && (
-        <Box id="exportContainer">
+        <Box id="exportContainerStudy">
           <EventCalendar
             theme="ios"
             themeVariant="light"
@@ -148,6 +201,7 @@ export const Conclude = () => {
             dragToMove={false}
             dragToResize={false}
             locale={localeTh}
+            data={studySchedule}
             view={{
               schedule: {
                 type: 'week',
@@ -158,15 +212,17 @@ export const Conclude = () => {
       )}
 
       {isModalOpen && (
-        <Box id="exportContainer2" sx={{ width: 2000 }}>
+        <Box id="exportContainerMidterm" sx={{ width: 4500 }}>
           <EventCalendar
             theme="ios"
-            themeVariant="dark"
+            themeVariant="light"
             clickToCreate={false}
             dragToCreate={false}
             dragToMove={false}
             dragToResize={false}
             locale={localeTh}
+            data={midtermSchedule}
+            selectedDate={setCalendar(midtermSchedule)}
             view={{
               schedule: {
                 type: 'month',
@@ -177,7 +233,7 @@ export const Conclude = () => {
       )}
 
       {isModalOpen && (
-        <Box id="exportContainer3" sx={{ width: 2000 }}>
+        <Box id="exportContainerFinal" sx={{ width: 4500 }}>
           <EventCalendar
             theme="ios"
             themeVariant="light"
@@ -186,6 +242,8 @@ export const Conclude = () => {
             dragToMove={false}
             dragToResize={false}
             locale={localeTh}
+            data={finalSchedule}
+            selectedDate={setCalendar(finalSchedule)}
             view={{
               schedule: {
                 type: 'month',
@@ -261,7 +319,7 @@ export const Conclude = () => {
                 </Button>
                 <Button
                   variant="contained"
-                  onClick={() => onCapture('exportContainer', 'exportContainer2', 'exportContainer3')}
+                  onClick={() => onCapture('exportContainerStudy', 'exportContainerMidterm', 'exportContainerFinal')}
                   sx={{
                     marginTop: 2,
                     marginLeft: 2,
