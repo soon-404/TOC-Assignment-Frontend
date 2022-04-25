@@ -69,6 +69,7 @@ export const StoreProvider: FC<StoreProviderProps> = ({ children, reducer, initi
   // * for log
   // useEffect(() => console.log('credit', usedCredit), [usedCredit])
 
+  // TODO : implement this
   const handleSendTranscript = async (files: File[]) => {
     // const transcriptData = await transcriptService.sendTranscript(files)
 

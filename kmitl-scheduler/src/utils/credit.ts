@@ -1,5 +1,5 @@
 import { BASE_CREDIT, MAXIMUM_CREDIT } from 'constants'
-import { clone, cloneDeep } from 'lodash'
+import { cloneDeep } from 'lodash'
 import { CourseCategory, RequiredCredit } from 'types'
 
 export const isEnoughCredit = (
