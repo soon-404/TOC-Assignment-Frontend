@@ -40,6 +40,7 @@ const StyledButton = styled(Button)(() => ({
 type StepCardProps = {
   stepContents: ReactNode[]
   finishText?: string
+  disabledNext?: boolean
   onFinish?: () => void
   onNext?: (step: number) => void
   onStepChange?: (step: number) => void
@@ -49,6 +50,7 @@ type StepCardProps = {
 export const StepCard = ({
   stepContents,
   finishText,
+  disabledNext,
   onFinish,
   onNext,
   onStepChange,
@@ -93,7 +95,7 @@ export const StepCard = ({
         <StyledButton disabled={activeStep === 0 && !onFirstStepBack} onClick={onBack}>
           Back
         </StyledButton>
-        <StyledButton onClick={onForward}>
+        <StyledButton onClick={onForward} disabled={disabledNext}>
           {activeStep === stepContents.length - 1 ? (finishText ? finishText : 'finish') : 'Next'}
         </StyledButton>
       </ActionZone>

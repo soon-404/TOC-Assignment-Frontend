@@ -12,32 +12,26 @@ const initialCredit: RequiredCredit = {
 }
 
 export type CreditState = {
-  baseCredit: RequiredCredit
-  calculatedCredit: RequiredCredit
+  usedCredit: RequiredCredit
 }
 
 export type CreditAction = {
-  setBaseCredit: Dispatch<SetStateAction<RequiredCredit>>
-  setCalculatedCredit: Dispatch<SetStateAction<RequiredCredit>>
-  initAllCredit: (credit: Credit) => void
+  setUsedCredit: Dispatch<SetStateAction<RequiredCredit>>
+  initAllCredit: (credit: Credit | RequiredCredit) => void
 }
 
 export const useCredit = (): CreditState & CreditAction => {
-  const [baseCredit, setBaseCredit] = useState<RequiredCredit>({ ...initialCredit })
-  const [calculatedCredit, setCalculatedCredit] = useState<RequiredCredit>({ ...initialCredit })
+  const [usedCredit, setUsedCredit] = useState<RequiredCredit>({ ...initialCredit })
 
-  const initAllCredit = (credit: Credit) => {
+  const initAllCredit = (credit: Credit | RequiredCredit) => {
     if (isRequiredCredit(credit)) {
-      setBaseCredit(credit)
-      setCalculatedCredit(credit)
+      setUsedCredit(credit)
     }
   }
 
   return {
-    baseCredit,
-    setBaseCredit,
-    calculatedCredit,
-    setCalculatedCredit,
+    usedCredit,
+    setUsedCredit,
     initAllCredit,
   }
 }

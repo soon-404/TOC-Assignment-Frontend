@@ -1,11 +1,23 @@
 import { useState, useEffect, useMemo } from 'react'
 import { saveAs } from 'file-saver'
-import { Box, styled, Button, Typography } from '@mui/material'
+import { Box, styled, Button, Typography, Paper, Stack } from '@mui/material'
 import { Eventcalendar as EventCalendar, toast, localeTh } from '@mobiscroll/react'
 import { toPng } from 'html-to-image'
 import JSZip from 'jszip'
 import { getFinalSchedules, getMidtermSchedules, getStudySchedules } from 'utils/course'
 import { useStore } from 'hooks/useStore'
+import { CourseCategory } from 'types'
+import { getRemainingCredit } from 'utils/credit'
+
+const categoryMapping: Record<CourseCategory, string> = {
+  department: '1. วิชาเฉพาะภาควิชา ',
+  specific_department: '2. วิชาเลิอกเฉพาะภาค ',
+  sciMath: '3. วิชาเลือกหมวดวิทยาศาสตร์กับคณิตศาสตร์ ',
+  language: '4. วิชาเลือกหมวดภาษา ',
+  human: '5. วิชาเลือกหมวดมนุษยศาสตร์ ',
+  social: '6.วิชาเลือกหมวดสังคมศาสตร',
+  free: '7. วิชาเลือกเสรี',
+}
 
 const ModalWrapper = styled(Box)`
   min-height: 100vh;
@@ -21,7 +33,9 @@ const ModalWrapper = styled(Box)`
 
 export const Conclude = () => {
   // store
-  const { allCourses, selectedCourses, sectionMapping } = useStore()
+  const { allCourses, selectedCourses, sectionMapping, usedCredit } = useStore()
+
+  const remainingCredit = useMemo(() => getRemainingCredit(usedCredit), [usedCredit])
 
   // state for table
   const [classTable, setClassTable] = useState('')
@@ -255,6 +269,29 @@ export const Conclude = () => {
         <Button variant="contained" onClick={() => setIsModalOpen(true)} sx={{ marginTop: 4 }}>
           ดาวน์โหลด
         </Button>
+      </Box>
+
+      <Typography variant="h4" color="#ffffff" align="center">
+        จำนวนหน่วยกิจที่เหลือ
+      </Typography>
+      <Box my={4}>
+        {Object.keys(categoryMapping).map((key) => (
+          <Stack direction="row" justifyContent="space-around" width="100%">
+            <Box minWidth={'400px'}>
+              <Typography variant="body1" color="#ffffff" align="left">
+                {categoryMapping[key as never]}
+              </Typography>
+            </Box>
+            <Box minWidth={'4ch'}>
+              <Typography variant="body1" color="#ffffff" align="right">
+                {remainingCredit[key as never]}
+              </Typography>
+            </Box>
+            <Typography variant="body1" color="#ffffff" align="left">
+              หน่วยกิจ
+            </Typography>
+          </Stack>
+        ))}
       </Box>
 
       {/* modal popup confirm download or cancel */}

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Box, Paper, Button, styled, Typography } from '@mui/material'
+import { Box, Paper, Button, styled, Typography, Stack } from '@mui/material'
 import { DropItem } from 'components/DropItem'
 import { useStore } from 'hooks/useStore'
 import { transcriptService } from 'services/transcript'
@@ -10,28 +10,14 @@ const DropItemWrapper = styled(Box)(() => ({
   overflow: 'hidden',
 }))
 
-const StyledButton = styled(Button)(() => ({
-  textTransform: 'none',
-  borderRadius: 10,
-  border: '2px #33b60b solid',
-  backgroundColor: '#ffffff',
-  color: '#3c00ff',
-  padding: '4px 16px',
-  minWidth: '100px',
-  '&:hover, &:focus': {
-    backgroundColor: '#c3c3c3',
-    border: '2px #c3c3c3 solid',
-  },
+const TextBox = styled(Stack)(() => ({
+  flexDirection: 'row',
 }))
 
 export const UploadTranscript = () => {
-  const { classYear } = useStore()
+  const { classYear, usedCredit, handleSendTranscript } = useStore()
 
   const [files, _setFiles] = useState<File[]>([])
-
-  const handleSendTranscript = async () => {
-    await transcriptService.sendTranscript(files)
-  }
 
   return (
     <Box>
@@ -39,7 +25,7 @@ export const UploadTranscript = () => {
         <DropItem
           files={files}
           setFiles={(file: File[]) => _setFiles(file)}
-          handleSendTranscript={handleSendTranscript}
+          handleSendTranscript={async () => await handleSendTranscript(files)}
         />
       </DropItemWrapper>
 
@@ -47,14 +33,31 @@ export const UploadTranscript = () => {
         <Paper sx={{ mt: 3 }}>
           <Box mb={2}>
             <Typography variant="body1" color="#ffffff" align="center">
-              ชั้นปีที่ x เทอม x
+              ชั้นปีที่ {classYear}
             </Typography>
           </Box>
-          <Box mb={1}>
-            <Typography variant="body1" color="#ffffff" align="center">
-              หน่วยกิจ
-            </Typography>
-          </Box>
+          <Stack alignItems="center" mb={1} px={8}>
+            {Object.keys(usedCredit).map((category) => (
+              <TextBox key={category}>
+                <Box minWidth="200px">
+                  <Typography variant="body1" color="#ffffff" align="left">
+                    {category}
+                  </Typography>
+                </Box>
+                <Typography variant="body1" color="#ffffff" align="left">
+                  ใช้ไป
+                </Typography>
+                <Box minWidth={'4ch'} mx={1}>
+                  <Typography variant="body1" color="#ffffff" align="right">
+                    {usedCredit[category as never]}
+                  </Typography>
+                </Box>
+                <Typography variant="body1" color="#ffffff" align="left">
+                  หน่วยกิจ
+                </Typography>
+              </TextBox>
+            ))}
+          </Stack>
         </Paper>
       )}
     </Box>

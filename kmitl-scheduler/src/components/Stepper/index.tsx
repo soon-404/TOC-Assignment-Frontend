@@ -2,7 +2,7 @@ import { FC } from 'react'
 import { Step, StepButton, Stepper, styled, Typography } from '@mui/material'
 import { useStore } from 'hooks/useStore'
 
-const steps = ['step 1', 'something 2', 'lorem 3', 'alcohol 4']
+const steps = ['upload transcript', 'วิชาหลัก', 'วิชาเลือกหรือเสรี', 'conclude']
 
 const StyledStepper = styled(Stepper)(() => ({
   padding: '24px 0',

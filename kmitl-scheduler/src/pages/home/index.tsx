@@ -9,6 +9,7 @@ import { UploadTranscript } from 'pages/home/steps/UploadTranscript'
 import { MajorSchedule } from 'pages/home/steps/MajorSchedule'
 import { MinorSchedule } from 'pages/home/steps/MinorSchedule'
 import { Conclude } from 'pages/home/steps/Conclude'
+import { useStore } from 'hooks/useStore'
 
 const HomeContainer = styled(Container)(() => ({
   display: 'flex',
@@ -22,13 +23,16 @@ const StepCardWrapper = styled(Box)(() => ({
   width: '100%',
 }))
 
-export const Home: React.FC = () => {
+export const Home = () => {
+  const { classYear } = useStore()
+
   return (
     <AnimateSharedLayout>
       <HomeContainer>
         <Header />
         <StepCardWrapper>
           <StepCard
+            disabledNext={!classYear}
             stepContents={[
               // * Step
               <UploadTranscript />,
