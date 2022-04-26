@@ -45,6 +45,8 @@ export const StoreProvider: FC<StoreProviderProps> = ({ children, reducer, initi
     if (isEnoughCredit(usedCredit, increasedCredit, MAXIMUM_CREDIT)) {
       setUsedCredit(addCredit(usedCredit, increasedCredit))
       dispatch({ type: ActionType.Add, courseId })
+    } else {
+      alert('หน่วยกิจเกิน')
     }
   }
   const deleteCourse = (courseId: CourseId) => {
