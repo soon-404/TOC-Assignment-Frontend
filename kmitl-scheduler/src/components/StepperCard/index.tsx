@@ -31,7 +31,7 @@ const StyledButton = styled(Button)(() => ({
   color: '#b27bec',
   padding: '4px 16px',
   minWidth: '100px',
-  '&:hover, &:focus': {
+  '&:hover': {
     backgroundColor: '#c3c3c3',
     border: '1px #c3c3c3 solid',
   },
