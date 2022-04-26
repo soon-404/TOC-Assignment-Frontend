@@ -1,4 +1,5 @@
 import { AxiosInstance } from 'axios'
+import FormData from 'form-data'
 import { httpClient } from 'api/httpClient'
 import { ApiTranscriptData, TranscriptData } from 'types'
 
@@ -12,11 +13,14 @@ class TranscriptService {
   public sendTranscript = async (files: File[]): Promise<TranscriptData | null> => {
     const formData = new FormData()
     formData.append('file', files[0])
+
     try {
       const {
         data: { data: transcript, success },
       } = await this._httpClient.post<ApiTranscriptData>('/uploader', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+        headers: {
+          ...formData.getHeaders(),
+        },
       })
 
       if (!success) {

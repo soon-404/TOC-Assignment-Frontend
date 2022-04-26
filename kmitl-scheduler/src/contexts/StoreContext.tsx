@@ -54,8 +54,6 @@ export const StoreProvider: FC<StoreProviderProps> = ({ children, reducer, initi
 
     setUsedCredit(subCredit(usedCredit, decreasedCredit))
     dispatch({ type: ActionType.Delete, courseId })
-
-    // * For log
   }
 
   const setSection = (courseId: CourseId, section: Section, sectionType: SectionType) =>
@@ -69,23 +67,20 @@ export const StoreProvider: FC<StoreProviderProps> = ({ children, reducer, initi
   // * for log
   // useEffect(() => console.log('credit', usedCredit), [usedCredit])
 
-  // TODO : implement this
   const handleSendTranscript = async (files: File[]) => {
-    // const transcriptData = await transcriptService.sendTranscript(files)
+    const transcriptData = await transcriptService.sendTranscript(files)
 
-    // if (!transcriptData) return
+    if (!transcriptData) return
 
-    // const _classYear = getClassYearFromStudentId(transcriptData.student_id)
+    const _classYear = getClassYearFromStudentId(transcriptData.student_id)
+    initAllCredit(transcriptData.credit_counter)
 
     // * ===== mock ===== *
-    const _classYear = getClassYearFromStudentId('620101010')
+    // const _classYear = getClassYearFromStudentId('6200000000')
+    // initAllCredit(BASE_CREDIT)
     //* ================= *
+
     setClassYear(_classYear)
-
-    // initAllCredit(transcriptData.credit_counter)
-    // * ===== mock ===== *
-    initAllCredit(BASE_CREDIT)
-    //* ================= *
   }
 
   useEffect(() => {
