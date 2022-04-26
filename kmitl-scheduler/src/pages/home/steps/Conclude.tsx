@@ -11,7 +11,7 @@ import { getRemainingCredit } from 'utils/credit'
 
 const categoryMapping: Record<CourseCategory, string> = {
   department: '1. วิชาเฉพาะภาควิชา ',
-  specific_department: '2. วิชาเลิอกเฉพาะภาค ',
+  specific_department: '2. วิชาเลือกเฉพาะภาค ',
   sciMath: '3. วิชาเลือกหมวดวิทยาศาสตร์กับคณิตศาสตร์ ',
   language: '4. วิชาเลือกหมวดภาษา ',
   human: '5. วิชาเลือกหมวดมนุษยศาสตร์ ',
@@ -51,6 +51,7 @@ export const Conclude = () => {
   const midtermSchedule = useMemo(() => getMidtermSchedules(allCourses, selectedCourses), [selectedCourses])
   const finalSchedule = useMemo(() => getFinalSchedules(allCourses, selectedCourses), [selectedCourses])
 
+  console.log(allCourses[selectedCourses.main[0]])
   // when isModalOpen, classTable, midtermTable change trigger this
   useEffect(() => {
     if (classTable != '' && midtermTable != '' && finalTable != '' && isModalOpen == true) {
@@ -85,11 +86,36 @@ export const Conclude = () => {
     })
   }
 
+  // Create Text File
+  const makeText = () => {
+    let text = ""
+    if (selectedCourses.main.length > 0){
+      for (let i = 0; i < selectedCourses.main.length; i++){
+        let row = ""
+        let data = allCourses[selectedCourses.main[i]]
+        row = `${selectedCourses.main[i]} ${data?.name} ${data?.course_type} ${data?.credit} ${data?.teacher}`
+        text += row
+        text += '\n'
+      }
+      
+    }
+    if (selectedCourses.option.length > 0){
+      for (let i = 0; i < selectedCourses.option.length; i++) {
+        let row = ''
+        let data = allCourses[selectedCourses.option[i]]
+        console.log(data)
+        row = `${selectedCourses.option[i]} ${data?.name} ${data?.course_type} ${data?.credit} ${data?.teacher}`
+        text += row
+        text += '\n'
+      }
+    }
+    return text
+  }
   // create zip file
   const makeZip = (blobs: string, blobs2: string, blobs3: string) => {
     var zip = new JSZip()
     // create text file (รอ data จาก context)
-    zip.file('Conclusion.txt', 'Hello World\n')
+    zip.file('subject_register.txt', makeText())
 
     // add class_table image to zip file
     var idx = blobs.indexOf('base64,') + 'base64,'.length
@@ -146,7 +172,7 @@ export const Conclude = () => {
   return (
     <Box>
       {/* real data calendar */}
-      <Typography sx={{ marginBottom: 5, color: 'white', fontSize: 35, fontWeight: 800 }}>Class Table</Typography>
+      <Typography sx={{ marginBottom: 5, color: 'white', fontSize: 35, fontWeight: 800 }}>ตารางเรียน</Typography>
       <EventCalendar
         theme="ios"
         themeVariant="light"
@@ -163,7 +189,7 @@ export const Conclude = () => {
         }}
       />
       <Typography sx={{ marginTop: 5, marginBottom: 5, color: 'white', fontSize: 35, fontWeight: 800 }}>
-        Midterm Test Table
+        ตารางสอบกลางภาค
       </Typography>
       <EventCalendar
         theme="ios"
@@ -182,7 +208,7 @@ export const Conclude = () => {
         }}
       />
       <Typography sx={{ marginTop: 5, marginBottom: 5, color: 'white', fontSize: 35, fontWeight: 800 }}>
-        Final Test Table
+        ตารางสอบปลายภาค
       </Typography>
       <EventCalendar
         theme="ios"
@@ -271,7 +297,7 @@ export const Conclude = () => {
         </Button>
       </Box>
 
-      <Typography variant="h4" color="#ffffff" align="center">
+      <Typography variant="h4" color="#ffffff" align="center" sx={{ fontWeight: 600 }}>
         จำนวนหน่วยกิจที่เหลือ
       </Typography>
       <Box my={4}>

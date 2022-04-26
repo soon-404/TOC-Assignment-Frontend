@@ -46,7 +46,7 @@ export const StoreProvider: FC<StoreProviderProps> = ({ children, reducer, initi
       setUsedCredit(addCredit(usedCredit, increasedCredit))
       dispatch({ type: ActionType.Add, courseId })
     } else {
-      alert('หน่วยกิจเกิน')
+      alert('หน่วยกิจของหมวดหมู่วิชาที่เลือกเต็มแล้ว')
     }
   }
   const deleteCourse = (courseId: CourseId) => {

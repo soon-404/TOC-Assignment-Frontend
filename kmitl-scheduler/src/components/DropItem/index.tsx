@@ -100,12 +100,12 @@ export const DropItem = ({ files, setFiles, handleSendTranscript }: DropItemProp
           />
           <ContentContainer>
             <Typography variant="h3" color="#ffffff" align="center">
-              upload transcript plz
+              อัปโหลดทรานสคริปต์
             </Typography>
           </ContentContainer>
         </DropzoneBox>
       ) : (
-        <StyledButton onClick={async () => await handleSendTranscript()}>Send Transcript</StyledButton>
+        <StyledButton onClick={async () => await handleSendTranscript()}>ส่งทรานสคริปต์</StyledButton>
       )}
     </Root>
   )

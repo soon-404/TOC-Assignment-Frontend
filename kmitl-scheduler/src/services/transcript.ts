@@ -19,7 +19,7 @@ class TranscriptService {
         data: { data: transcript, success },
       } = await this._httpClient.post<ApiTranscriptData>('/uploader', formData, {
         headers: {
-          ...formData.getHeaders(),
+          ...formData.getHeaders,
         },
       })
 
