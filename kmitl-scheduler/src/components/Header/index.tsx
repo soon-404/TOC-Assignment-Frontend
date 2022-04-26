@@ -19,8 +19,8 @@ export const Header: React.FC = () => {
   return (
     <StyledHeader>
       <TypographyWrapper>
-        <Typography variant="h4" color="#fff" align="center">
-          จะจบเมื่อไหร่ซิ
+        <Typography variant="h3" color="#fff" align="center" sx={{ fontWeight: 600 }}>
+          KMITL Register
         </Typography>
       </TypographyWrapper>
       <Box width="100%">

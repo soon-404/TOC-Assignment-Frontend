@@ -4,7 +4,7 @@ import { apiUrl } from 'constants'
 
 const httpClient = axios.create({
   baseURL: apiUrl,
-  timeout: 12000, // * 12 second
+  timeout: 90000, // * 12 second
 })
 
 axiosRetry(httpClient, { retries: 3, retryDelay: () => 1000 })

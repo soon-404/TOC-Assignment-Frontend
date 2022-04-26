@@ -96,7 +96,7 @@ export const StepCard = ({
           Back
         </StyledButton>
         <StyledButton onClick={onForward} disabled={disabledNext}>
-          {activeStep === stepContents.length - 1 ? (finishText ? finishText : 'finish') : 'Next'}
+          {activeStep === stepContents.length - 1 ? (finishText ? finishText : 'Finish') : 'Next'}
         </StyledButton>
       </ActionZone>
     </StepCardContainer>
