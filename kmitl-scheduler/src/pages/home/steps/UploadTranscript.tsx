@@ -3,6 +3,8 @@ import { Box, Paper, Button, styled, Typography, Stack } from '@mui/material'
 import { DropItem } from 'components/DropItem'
 import { useStore } from 'hooks/useStore'
 import { transcriptService } from 'services/transcript'
+import { uploadingCategoryMapping } from 'constants'
+import { CourseCategory } from 'types'
 
 const DropItemWrapper = styled(Box)(() => ({
   borderRadius: 20,
@@ -41,7 +43,7 @@ export const UploadTranscript = () => {
               <TextBox key={category}>
                 <Box minWidth="200px">
                   <Typography variant="body1" color="#ffffff" align="left">
-                    {category}
+                    {uploadingCategoryMapping[category as CourseCategory]}
                   </Typography>
                 </Box>
                 <Typography variant="body1" color="#ffffff" align="left">

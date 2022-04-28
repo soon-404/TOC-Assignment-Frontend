@@ -8,16 +8,8 @@ import { getFinalSchedules, getMidtermSchedules, getStudySchedules } from 'utils
 import { useStore } from 'hooks/useStore'
 import { CourseCategory } from 'types'
 import { getRemainingCredit } from 'utils/credit'
+import { categoryMapping } from 'constants'
 
-const categoryMapping: Record<CourseCategory, string> = {
-  department: '1. วิชาเฉพาะภาควิชา ',
-  specific_department: '2. วิชาเลือกเฉพาะภาค ',
-  sciMath: '3. วิชาเลือกหมวดวิทยาศาสตร์กับคณิตศาสตร์ ',
-  language: '4. วิชาเลือกหมวดภาษา ',
-  human: '5. วิชาเลือกหมวดมนุษยศาสตร์ ',
-  social: '6.วิชาเลือกหมวดสังคมศาสตร',
-  free: '7. วิชาเลือกเสรี',
-}
 
 const ModalWrapper = styled(Box)`
   min-height: 100vh;
