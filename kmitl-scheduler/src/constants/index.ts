@@ -40,9 +40,9 @@ export const categoryMapping: Record<CourseCategory, string> = {
 export const uploadingCategoryMapping: Record<CourseCategory, string> = {
   department: 'วิชาเฉพาะภาควิชา ',
   specific_department: 'วิชาเลือกเฉพาะภาค ',
-  sciMath: 'วิชาเลือกหมวดวิทยาศาสตร์กับคณิตศาสตร์ ',
+  sciMath: 'วิชาเลือกหมวดวิทย์-คณิต ',
   language: 'วิชาเลือกหมวดภาษา ',
   human: 'วิชาเลือกหมวดมนุษยศาสตร์ ',
-  social: 'วิชาเลือกหมวดสังคมศาสตร',
-  free: 'วิชาเลือกเสรี',
+  social: 'วิชาเลือกหมวดสังคมศาสตร์ ',
+  free: 'วิชาเลือกเสรี ',
 }
