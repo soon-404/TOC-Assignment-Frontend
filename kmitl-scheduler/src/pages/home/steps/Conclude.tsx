@@ -355,7 +355,7 @@ export const Conclude = () => {
               <Box>
                 <Typography>1. ตารางเรียน</Typography>
                 <Typography>2. ตารางสอบกลางภาค</Typography>
-                <Typography>3. ตารางสอยปลายภาค</Typography>
+                <Typography>3. ตารางสอบปลายภาค</Typography>
                 <Typography>4. สรุปรายวิชาที่ได้ทำการเลือก</Typography>
               </Box>
               <Typography sx={{ margin: 1, fontWeight: 'bold' }}>คุณต้องการที่จะทำการดาวน์โหลดหรือไม่ ?</Typography>

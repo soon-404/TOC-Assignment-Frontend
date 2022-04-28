@@ -20,7 +20,7 @@ export const Header: React.FC = () => {
     <StyledHeader>
       <TypographyWrapper>
         <Typography variant="h3" color="#fff" align="center" sx={{ fontWeight: 600 }}>
-          KMITL Register
+          KMITL Scheduler
         </Typography>
       </TypographyWrapper>
       <Box width="100%">
