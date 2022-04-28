@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo } from 'react'
 import { Stack } from '@mui/material'
 import { Eventcalendar as EventCalendar, toast, localeTh } from '@mobiscroll/react'
-
+import '@mobiscroll/react/dist/css/mobiscroll.min.css';
 import { DragZone } from 'components/Dragzone'
 import { DropZone } from 'components/Dropzone'
 import SearchBar from 'components/SearchBar'
