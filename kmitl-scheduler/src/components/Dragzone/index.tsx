@@ -28,7 +28,7 @@ interface DragZoneProps {
 export const DragZone = ({ color, courseType, dropZonesDomRects }: DragZoneProps) => {
   const { open } = useDialog()
   const { allCourses, addCourse, unselectedCourses, externalUnselectedCourses } = useStore()
-  const { filterCategory, keyword } = useSearch()
+  const { filterCategory, keyword, sortField } = useSearch()
 
   const handleOnDragEnd = (courseId: CourseId, { point }: PanInfo) => {
     if (!dropZonesDomRects) return
@@ -44,13 +44,18 @@ export const DragZone = ({ color, courseType, dropZonesDomRects }: DragZoneProps
   }
 
   const filteredCourses: CourseId[] = useMemo(
-    () =>
-      filterByCoursesCategory(
+    () => {
+      const c = filterByCoursesCategory(
         keyword === '' ? unselectedCourses[courseType] : externalUnselectedCourses[courseType],
         allCourses,
         filterCategory,
-      ),
-    [unselectedCourses, courseType, allCourses, filterCategory, keyword],
+      )
+      return c.sort((a,b) => {
+        if (sortField === 'id') return a.localeCompare(b)
+        return allCourses[a][sortField].localeCompare(allCourses[b][sortField])
+      })
+    },
+    [unselectedCourses, courseType, allCourses, filterCategory, keyword, sortField],
   )
 
   return (
@@ -67,3 +72,4 @@ export const DragZone = ({ color, courseType, dropZonesDomRects }: DragZoneProps
     </Root>
   )
 }
+

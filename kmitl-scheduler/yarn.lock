@@ -742,9 +742,9 @@
   dependencies:
     "is-arrayish" "^0.2.1"
 
-"esbuild-darwin-arm64@0.14.27":
-  "integrity" "sha512-BEsv2U2U4o672oV8+xpXNxN9bgqRCtddQC6WBh4YhXKDcSZcdNh7+6nS+DM2vu7qWIWNA4JbRG24LUUYXysimQ=="
-  "resolved" "https://registry.npmjs.org/esbuild-darwin-arm64/-/esbuild-darwin-arm64-0.14.27.tgz"
+"esbuild-darwin-64@0.14.27":
+  "integrity" "sha512-czw/kXl/1ZdenPWfw9jDc5iuIYxqUxgQ/Q+hRd4/3udyGGVI31r29LCViN2bAJgGvQkqyLGVcG03PJPEXQ5i2g=="
+  "resolved" "https://registry.npmjs.org/esbuild-darwin-64/-/esbuild-darwin-64-0.14.27.tgz"
   "version" "0.14.27"
 
 "esbuild@^0.14.14":
